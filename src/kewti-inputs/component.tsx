@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Mic, StopCircle } from "lucide-react";
+import { useState, useEffect, useRef } from "react"
 
 const chatInputVariants = cva(
     "relative w-full rounded-xl border bg-background shadow-sm transition-all duration-200 focus-within:ring-1 focus-within:ring-ring",
@@ -34,6 +35,13 @@ interface ChatInputProps extends VariantProps<typeof chatInputVariants> {
     defaultLanguage?: "am" | "en" // Added prop
 }
 
+declare global {
+    interface Window {
+        webkitSpeechRecognition: any
+        SpeechRecognition: any
+    }
+}
+
 export function KewtiInput({
     variant = "input",
     placeholder = "Type...",
@@ -48,7 +56,89 @@ export function KewtiInput({
     const [options, setOptions] = React.useState<string[]>([])
     const [selectedIndex, setSelectedIndex] = React.useState(0)
     const [language, setLanguage] = React.useState<"am" | "en">(defaultLanguage)
-    const [recording, setRecording] = React.useState(false);
+    const [supported, setSupported] = useState(true)
+    const [listening, setListening] = useState(false)
+    const [transcript, setTranscript] = useState("")
+    const [finalTranscript, setFinalTranscript] = useState("")
+    const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
+
+    const recognitionRef = useRef<any>(null)
+
+
+    useEffect(() => {
+        const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition
+
+        if (!SpeechRecognition) {
+            setSupported(false)
+            return
+        }
+
+        const recognition = new SpeechRecognition()
+
+        recognition.lang = "am-ET"
+        recognition.continuous = true
+        recognition.interimResults = true
+
+        recognition.onstart = () => {
+            setListening(true)
+        }
+
+        recognition.onend = () => {
+            setListening(false)
+        }
+
+        recognition.onerror = (e: any) => {
+            console.error("Speech error:", e)
+        }
+
+        recognition.onresult = (event: any) => {
+            let interim = ""
+            let finalText = ""
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const text = event.results[i][0].transcript
+
+                if (event.results[i].isFinal) {
+                    finalText += text + " "
+                } else {
+                    interim += text
+                }
+            }
+            setValue(interim)
+            if (finalText) {
+                setValue(prev => prev + finalText)
+            }
+        }
+
+        recognitionRef.current = recognition
+
+        // Load TTS voices
+        const loadVoices = () => {
+            const allVoices = speechSynthesis.getVoices()
+            setVoices(allVoices)
+        }
+
+        loadVoices()
+        speechSynthesis.onvoiceschanged = loadVoices
+    }, [])
+
+    const startListening = () => {
+        recognitionRef.current?.start()
+    }
+
+    const stopListening = () => {
+        recognitionRef.current?.stop()
+    }
+
+    if (!supported) {
+        return (
+            <div className="p-6 text-red-500">
+                Web Speech API is not supported in this browser.
+            </div>
+        )
+    }
+
 
     const inputRef = React.useRef<HTMLTextAreaElement | HTMLInputElement | null>(null)
 
@@ -67,9 +157,16 @@ export function KewtiInput({
     const replaceCurrentWord = (text: string, replacement: string) =>
         text.replace(/(\S+)$/, replacement)
 
+
     const Record = () => {
-        
-        setRecording(!recording);
+        setListening(!listening);
+        if (listening)
+        {
+            stopListening();
+        }
+        else {
+            startListening();
+        }
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -131,7 +228,6 @@ export function KewtiInput({
             e.preventDefault()
             if (value.trim()) {
                 onSend?.(value)
-                setValue("")
                 setOptions([])
                 setSelectedIndex(0)
             }
@@ -218,8 +314,8 @@ export function KewtiInput({
                             placeholder={placeholder}
                         />
                     )}
-                    <Button onClick={() => {Record();}} variant="ghost" size="sm" className="mt-4">
-                        {recording? <StopCircle className="h-5 w-6" /> : <Mic className="h-5 w-6" />}
+                    <Button onClick={() => { Record(); }} variant="ghost" size="sm" className="mt-4">
+                        {listening ? <StopCircle className="h-5 w-6" /> : <Mic className="h-5 w-6" />}
                     </Button>
                 </div>
             </div>
