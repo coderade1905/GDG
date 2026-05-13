@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 type MapItem = { name: string; src: string; displayName: string }
@@ -6,92 +6,114 @@ type MapItem = { name: string; src: string; displayName: string }
 type Props = {
   initial?: string
   onChange?: (item: MapItem | undefined) => void
+  onRegionSelect?: (info: { map: string; regionIndex: number }) => void
   showPreview?: boolean
   label?: string
 }
 
-export function KewtiMap({ initial, onChange, showPreview = true, label = 'Select Map' }: Props) {
-  const [maps, setMaps] = useState<MapItem[]>([])
-  const [selectedName, setSelectedName] = useState<string | undefined>(initial)
+// Import the SVG as raw text (Vite `?raw`). If TypeScript complains, the tsconfig
+// may need a `declare module '*.svg?raw'` entry; ignore TS here for simplicity.
+// @ts-ignore
+import mapRaw from './maps/map.svg?raw'
 
-  // Load images on mount
+export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true, label = 'Select Map' }: Props) {
+  const svgContainerRef = useRef<HTMLDivElement | null>(null)
+  const [selectedRegion, setSelectedRegion] = useState<number | null>(null)
+
   useEffect(() => {
-    ;(async () => {
-      try {
-        // @ts-ignore - import.meta.glob typing
-        const imageModules = import.meta.glob('./maps/*.{png,jpg,jpeg,svg,webp}', { eager: true })
-        const loadedMaps: MapItem[] = Object.entries(imageModules)
-          .map(([path, mod]: [string, any]) => {
-            const src = (mod && (mod.default || mod)) || ''
-            const name = path.split('/').pop()?.replace(/\.(png|jpe?g|svg|webp)$/i, '') || 'unknown'
-            // Rename "map frame" to "none"
-            const displayName = name.toLowerCase() === 'map frame' ? 'None' : name
-            return { name, src, displayName }
-          })
-          .sort((a, b) => a.displayName.localeCompare(b.displayName))
+    const container = svgContainerRef.current
+    if (!container) return
 
-        setMaps(loadedMaps)
-        if (!initial && loadedMaps.length > 0 && !selectedName) {
-          setSelectedName(loadedMaps[0].name)
-        }
-      } catch (error) {
-        console.error('Failed to load maps:', error)
+    // Inline the raw SVG markup
+    container.innerHTML = mapRaw || ''
+
+    const svg = container.querySelector('svg') as SVGElement | null
+    if (svg) {
+      svg.style.width = '100%'
+      svg.style.height = '100%'
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+    }
+
+    const regionSelector = 'path, rect, polygon, circle, g'
+    const regions = Array.from(container.querySelectorAll(regionSelector)) as Element[]
+
+    const cleanup: Array<{ el: Element; click: EventListenerOrEventListenerObject; keydown: EventListenerOrEventListenerObject; prevStroke?: string | null; prevStrokeWidth?: string | null }> = []
+
+    const mapName = 'map'
+
+    regions.forEach((el, i) => {
+      el.setAttribute('data-region-index', String(i))
+      el.setAttribute('role', 'button')
+      el.setAttribute('tabindex', '0')
+      ;(el as HTMLElement).style.cursor = 'pointer'
+
+      const prevStroke = el.getAttribute('stroke')
+      const prevStrokeWidth = el.getAttribute('stroke-width')
+
+      const handleClick = (e: Event) => {
+        e.stopPropagation()
+
+        // Clear previous highlight
+        cleanup.forEach((r) => {
+          if (r.el.getAttribute('data-kewti-selected') === 'true') {
+            if (r.prevStroke != null) r.el.setAttribute('stroke', r.prevStroke)
+            else r.el.removeAttribute('stroke')
+            if (r.prevStrokeWidth != null) r.el.setAttribute('stroke-width', r.prevStrokeWidth)
+            else r.el.removeAttribute('stroke-width')
+            r.el.removeAttribute('data-kewti-selected')
+          }
+        })
+
+        // Apply highlight to the clicked element
+        el.setAttribute('data-kewti-selected', 'true')
+        el.setAttribute('stroke', '#2b6ef6')
+        el.setAttribute('stroke-width', '6')
+
+        setSelectedRegion(i)
+        onRegionSelect?.({ map: mapName, regionIndex: i })
       }
-    })()
+
+      const handleKey = (ev: KeyboardEvent) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault()
+          handleClick(ev as unknown as Event)
+        }
+      }
+
+      el.addEventListener('click', handleClick)
+      el.addEventListener('keydown', handleKey as EventListener)
+
+      cleanup.push({ el, click: handleClick, keydown: handleKey, prevStroke, prevStrokeWidth })
+    })
+
+    return () => {
+      cleanup.forEach((r) => {
+        r.el.removeEventListener('click', r.click)
+        r.el.removeEventListener('keydown', r.keydown as EventListener)
+        if (r.el.getAttribute('data-kewti-selected') === 'true') {
+          if (r.prevStroke != null) r.el.setAttribute('stroke', r.prevStroke)
+          else r.el.removeAttribute('stroke')
+          if (r.prevStrokeWidth != null) r.el.setAttribute('stroke-width', r.prevStrokeWidth)
+          else r.el.removeAttribute('stroke-width')
+          r.el.removeAttribute('data-kewti-selected')
+        }
+      })
+    }
   }, [])
-
-  const selected = maps.find((m) => m.name === selectedName) ?? maps[0]
-
-  useEffect(() => {
-    onChange?.(selected)
-  }, [selected, onChange])
 
   return (
     <div className="flex flex-col gap-4 w-full">
-      {/* Label */}
       <label className="flex flex-col gap-3">
         <span className="text-sm font-medium text-foreground">{label}</span>
-        
-        {/* Horizontal Button Selection */}
-        <div className="flex flex-wrap gap-2">
-          {maps.length === 0 ? (
-            <div className="text-sm text-muted-foreground">No maps available</div>
-          ) : (
-            maps.map((map) => (
-              <button
-                key={map.name}
-                onClick={() => setSelectedName(map.name)}
-                className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-all outline-none',
-                  'border border-input hover:border-ring/50',
-                  'focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50',
-                  'dark:border-input/50 dark:hover:border-input',
-                  selected?.name === map.name
-                    ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                    : 'bg-background text-foreground hover:bg-muted'
-                )}
-              >
-                {map.displayName}
-              </button>
-            ))
-          )}
-        </div>
       </label>
 
-      {/* Map Preview */}
-      {showPreview && selected && (
-        <div className="relative w-full h-80 rounded-lg border border-border overflow-hidden bg-muted/30 flex items-center justify-center group">
-          <img
-            src={selected.src}
-            alt={selected.displayName}
-            className="w-full h-full object-contain opacity-95 transition-transform group-hover:scale-[1.02]"
-          />
-          {/* Label overlay */}
-          <div className="absolute left-3 top-3 px-2.5 py-1.5 rounded-md bg-black/40 backdrop-blur-sm">
-            <span className="text-xs font-medium text-white">{selected.displayName}</span>
-          </div>
+      <div className="relative w-full h-80 rounded-lg border border-border overflow-hidden bg-muted/30 flex items-center justify-center">
+        <div ref={svgContainerRef} className="w-full h-full" />
+
+        <div className="absolute left-3 top-3 px-2.5 py-1.5 rounded-md bg-black/40 backdrop-blur-sm">
+          <span className="text-xs font-medium text-white">SVG Map</span>
         </div>
-      )}
+      </div>
     </div>
   )
 }
