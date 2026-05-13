@@ -93,22 +93,13 @@ export function KewtiInput({
         }
 
         recognition.onresult = (event: any) => {
-            let interim = ""
-            let finalText = ""
+            let text = ""
 
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const text = event.results[i][0].transcript
+            for (let i = 0; i < event.results.length; i++) {
+                text += event.results[i][0].transcript
+            }
 
-                if (event.results[i].isFinal) {
-                    finalText += text + " "
-                } else {
-                    interim += text
-                }
-            }
-            setValue(interim)
-            if (finalText) {
-                setValue(prev => prev + finalText)
-            }
+            setValue(text)
         }
 
         recognitionRef.current = recognition
@@ -160,8 +151,7 @@ export function KewtiInput({
 
     const Record = () => {
         setListening(!listening);
-        if (listening)
-        {
+        if (listening) {
             stopListening();
         }
         else {
