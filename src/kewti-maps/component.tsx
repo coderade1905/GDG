@@ -9,6 +9,7 @@ type Props = {
   onRegionSelect?: (info: { map: string; regionIndex: number }) => void
   showPreview?: boolean
   label?: string
+  theme?: ThemeName | Partial<Theme>  // Preset or custom override
 }
 
 // Import the SVG as raw text (Vite `?raw`). If TypeScript complains, the tsconfig
@@ -17,25 +18,20 @@ type Props = {
 import mapRaw from './maps/map.svg?raw'
 
 // Add styles for SVG animations
-const svgStyles = `
+const svgStyles = (theme: Theme) => `
   [data-region-index] {
+    fill: ${theme.fillColor};
     transition: opacity 0.3s ease, transform 0.3s ease, stroke 0.3s ease;
     transform-origin: center;
   }
   [data-kewti-selected] {
+    stroke: ${theme.borderColor};
     animation: zoomIn 0.4s ease-out forwards;
-  }
-  @keyframes zoomIn {
-    from {
-      transform: scale(1);
-    }
-    to {
-      transform: scale(1.04);
-    }
   }
   [data-region-index]:hover:not([data-kewti-selected]) {
     opacity: 0.8 !important;
     transform: scale(1.01);
+    stroke: ${theme.hoverColor};
   }
 `
 
@@ -54,6 +50,58 @@ const regionDefinitions: Array<{ svgIndex: number; name: string }> = [
 const regionDefinitionMap = new Map(regionDefinitions.map((region) => [region.svgIndex, region.name]))
 
 const getRegionName = (index: number) => regionDefinitionMap.get(index) ?? ''
+
+// Define theme types and presets
+type Theme = {
+  selectedColor: string
+  hoverColor: string
+  borderColor: string
+  fillColor: string
+  textColor: string
+  backgroundColor: string
+  borderWidth: number
+}
+
+type ThemeName = 'dark' | 'light' | 'green' | 'blue'
+
+const THEMES: Record<ThemeName, Theme> = {
+  dark: {
+    selectedColor: '#111111',
+    hoverColor: '#333333',
+    borderColor: '#ffffff',
+    fillColor: '#1a1a1a',
+    textColor: '#ffffff',
+    backgroundColor: '#000000',
+    borderWidth: 6,
+  },
+  light: {
+    selectedColor: '#ffffff',
+    hoverColor: '#f0f0f0',
+    borderColor: '#000000',
+    fillColor: '#f5f5f5',
+    textColor: '#000000',
+    backgroundColor: '#ffffff',
+    borderWidth: 6,
+  },
+  green: {
+    selectedColor: '#10b981',
+    hoverColor: '#d1fae5',
+    borderColor: '#059669',
+    fillColor: '#ecfdf5',
+    textColor: '#065f46',
+    backgroundColor: '#f0fdf4',
+    borderWidth: 6,
+  },
+  blue: {
+    selectedColor: '#3b82f6',
+    hoverColor: '#dbeafe',
+    borderColor: '#1d4ed8',
+    fillColor: '#eff6ff',
+    textColor: '#1e40af',
+    backgroundColor: '#f8fafc',
+    borderWidth: 6,
+  },
+}
 
 export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
   const svgContainerRef = useRef<HTMLDivElement | null>(null)
@@ -139,7 +187,7 @@ export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
         })
 
         setSelectedRegion(svgIndex)
-        onRegionSelect?.({ map: mapName, regionIndex: svgIndex })
+        onRegionSelect?.(getRegionName(svgIndex))  // Pass just the name
       }
 
       const handleKey: EventListener = (ev) => {
