@@ -39,31 +39,21 @@ const svgStyles = `
   }
 `
 
-const regionNames: Record<number, string> = {
-  0: 'AMINA',
-  1: 'OROMIA',
-  2: 'SOMALIA',
-  3: 'AMHARA',
-  4: 'SNNPE',
-  5: 'AFAR',
-  6: 'TIGRAY',
-  7: 'BENSHANGUL',
-  8: 'GAMBELA',
-  9: 'HODAN',
-  10: 'MUSA',
-  11: 'NURA',
-  12: 'ALI',
-  13: 'SOFIA',
-  14: 'ADDIS ABEBA',
-  15: 'KHADIJA',
-  16: 'FARAH',
-  17: 'ZAINAB',
-  18: 'HUSSEIN',
-  19: 'MUNA',
-  20: 'ADAN',
-}
+const regionDefinitions: Array<{ svgIndex: number; name: string }> = [
+  { svgIndex: 1, name: 'OROMIA' },
+  { svgIndex: 2, name: 'SOMALIA' },
+  { svgIndex: 3, name: 'AMHARA' },
+  { svgIndex: 4, name: 'SNNPE' },
+  { svgIndex: 5, name: 'AFAR' },
+  { svgIndex: 6, name: 'TIGRAY' },
+  { svgIndex: 7, name: 'BENSHANGUL' },
+  { svgIndex: 8, name: 'GAMBELA' },
+  { svgIndex: 14, name: 'ADDIS ABEBA' },
+] 
 
-const getRegionName = (index: number) => regionNames[index] ?? `Section ${index + 1}`
+const regionDefinitionMap = new Map(regionDefinitions.map((region) => [region.svgIndex, region.name]))
+
+const getRegionName = (index: number) => regionDefinitionMap.get(index) ?? ''
 
 export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
   const svgContainerRef = useRef<HTMLDivElement | null>(null)
@@ -98,11 +88,19 @@ export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
     const regions = Array.from(container.querySelectorAll(regionSelector)) as Element[]
 
     const cleanup: Array<{ el: Element; click: EventListenerOrEventListenerObject; keydown: EventListenerOrEventListenerObject; mouseover: EventListenerOrEventListenerObject; mouseout: EventListenerOrEventListenerObject; prevStroke?: string | null; prevStrokeWidth?: string | null; prevOpacity?: string | null }> = []
+    const interactiveRegionIndices = new Set<number>(regionDefinitions.map((region) => region.svgIndex))
 
     const mapName = 'map'
 
-    regions.forEach((el, i) => {
-      el.setAttribute('data-region-index', String(i))
+    regions.forEach((el, svgIndex) => {
+      const isInteractive = interactiveRegionIndices.has(svgIndex)
+
+      if (!isInteractive) {
+        ;(el as HTMLElement).style.pointerEvents = 'none'
+        return
+      }
+
+      el.setAttribute('data-region-index', String(svgIndex))
       el.setAttribute('role', 'button')
       el.setAttribute('tabindex', '0')
       ;(el as HTMLElement).style.cursor = 'pointer'
@@ -140,8 +138,8 @@ export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
           }
         })
 
-        setSelectedRegion(i)
-        onRegionSelect?.({ map: mapName, regionIndex: i })
+        setSelectedRegion(svgIndex)
+        onRegionSelect?.({ map: mapName, regionIndex: svgIndex })
       }
 
       const handleKey: EventListener = (ev) => {
