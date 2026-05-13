@@ -19,6 +19,7 @@ import mapRaw from './maps/map.svg?raw'
 export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true, label = 'Select Map' }: Props) {
   const svgContainerRef = useRef<HTMLDivElement | null>(null)
   const [selectedRegion, setSelectedRegion] = useState<number | null>(null)
+  const cleanupRef = useRef<Array<{ el: Element; click: EventListenerOrEventListenerObject; keydown: EventListenerOrEventListenerObject; prevStroke?: string | null; prevStrokeWidth?: string | null; prevOpacity?: string | null }>>([])
 
   useEffect(() => {
     const container = svgContainerRef.current
@@ -37,7 +38,8 @@ export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true
     const regionSelector = 'path, rect, polygon, circle, g'
     const regions = Array.from(container.querySelectorAll(regionSelector)) as Element[]
 
-    const cleanup: Array<{ el: Element; click: EventListenerOrEventListenerObject; keydown: EventListenerOrEventListenerObject; prevStroke?: string | null; prevStrokeWidth?: string | null }> = []
+    const cleanup: Array<{ el: Element; click: EventListenerOrEventListenerObject; keydown: EventListenerOrEventListenerObject; prevStroke?: string | null; prevStrokeWidth?: string | null; prevOpacity?: string | null }> = []
+    cleanupRef.current = cleanup
 
     const mapName = 'map'
 
@@ -49,25 +51,34 @@ export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true
 
       const prevStroke = el.getAttribute('stroke')
       const prevStrokeWidth = el.getAttribute('stroke-width')
+      const prevOpacity = el.getAttribute('opacity')
 
       const handleClick = (e: Event) => {
         e.stopPropagation()
 
-        // Clear previous highlight
+        // Clear previous highlight and reset all regions
         cleanup.forEach((r) => {
-          if (r.el.getAttribute('data-kewti-selected') === 'true') {
-            if (r.prevStroke != null) r.el.setAttribute('stroke', r.prevStroke)
-            else r.el.removeAttribute('stroke')
-            if (r.prevStrokeWidth != null) r.el.setAttribute('stroke-width', r.prevStrokeWidth)
-            else r.el.removeAttribute('stroke-width')
-            r.el.removeAttribute('data-kewti-selected')
-          }
+          if (r.prevStroke != null) r.el.setAttribute('stroke', r.prevStroke)
+          else r.el.removeAttribute('stroke')
+          if (r.prevStrokeWidth != null) r.el.setAttribute('stroke-width', r.prevStrokeWidth)
+          else r.el.removeAttribute('stroke-width')
+          if (r.prevOpacity != null) r.el.setAttribute('opacity', r.prevOpacity)
+          else r.el.setAttribute('opacity', '1')
+          r.el.removeAttribute('data-kewti-selected')
         })
 
         // Apply highlight to the clicked element
         el.setAttribute('data-kewti-selected', 'true')
         el.setAttribute('stroke', '#2b6ef6')
         el.setAttribute('stroke-width', '6')
+        el.setAttribute('opacity', '1')
+
+        // Dim all other regions
+        cleanup.forEach((r) => {
+          if (r.el !== el) {
+            r.el.setAttribute('opacity', '0.4')
+          }
+        })
 
         setSelectedRegion(i)
         onRegionSelect?.({ map: mapName, regionIndex: i })
@@ -83,7 +94,7 @@ export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true
       el.addEventListener('click', handleClick)
       el.addEventListener('keydown', handleKey as EventListener)
 
-      cleanup.push({ el, click: handleClick, keydown: handleKey, prevStroke, prevStrokeWidth })
+      cleanup.push({ el, click: handleClick, keydown: handleKey, prevStroke, prevStrokeWidth, prevOpacity })
     })
 
     return () => {
@@ -95,6 +106,8 @@ export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true
           else r.el.removeAttribute('stroke')
           if (r.prevStrokeWidth != null) r.el.setAttribute('stroke-width', r.prevStrokeWidth)
           else r.el.removeAttribute('stroke-width')
+          if (r.prevOpacity != null) r.el.setAttribute('opacity', r.prevOpacity)
+          else r.el.setAttribute('opacity', '1')
           r.el.removeAttribute('data-kewti-selected')
         }
       })
@@ -105,6 +118,13 @@ export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true
     <div className="flex flex-col gap-4 w-full">
       <label className="flex flex-col gap-3">
         <span className="text-sm font-medium text-foreground">{label}</span>
+        {selectedRegion !== null && (
+          <div className="px-3 py-2 rounded-md bg-blue-100 dark:bg-blue-950 border border-blue-300 dark:border-blue-700">
+            <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+              region{selectedRegion + 1}
+            </span>
+          </div>
+        )}
       </label>
 
       <div className="relative w-full h-80 rounded-lg border border-border overflow-hidden bg-muted/30 flex items-center justify-center">
