@@ -43,7 +43,7 @@ const regionNames: Record<number, string> = {
   0: 'AMINA',
   1: 'OROMIA',
   2: 'SOMALIA',
-  3: 'OMAR',
+  3: 'AMHARA',
   4: 'SNNPE',
   5: 'AFAR',
   6: 'TIGRAY',
@@ -129,7 +129,7 @@ export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
 
         // Apply highlight to the clicked element
         el.setAttribute('data-kewti-selected', 'true')
-        el.setAttribute('stroke', '#2b6ef6')
+        el.setAttribute('stroke', '#111111')
         el.setAttribute('stroke-width', '6')
         el.setAttribute('opacity', '1')
 
@@ -207,8 +207,8 @@ export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
       <label className="flex flex-col gap-3">
         <span className="text-sm font-medium text-foreground">{label}</span>
         {selectedRegion !== null && (
-          <div className="px-3 py-2 rounded-md bg-blue-100 dark:bg-blue-950 border border-blue-300 dark:border-blue-700 animate-in fade-in slide-in-from-top-2 duration-300">
-            <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+          <div className="px-3 py-2 rounded-md bg-black text-white border border-white/15 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+            <span className="text-sm font-semibold tracking-wide uppercase text-white">
               {getRegionName(selectedRegion)}
             </span>
           </div>
@@ -219,15 +219,15 @@ export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
         <div ref={svgContainerRef} className="w-full h-full" />
 
         <div className={cn(
-          "absolute left-3 top-3 px-2.5 py-1.5 rounded-md bg-black/40 backdrop-blur-sm transition-all duration-300",
+          "absolute left-3 top-3 px-2.5 py-1.5 rounded-md bg-black text-white border border-white/10 backdrop-blur-sm transition-all duration-300",
           selectedRegion !== null || hoveredRegion !== null ? "opacity-0 pointer-events-none" : "opacity-100"
         )}>
-          <span className="text-xs font-medium text-white">SVG Map</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-white">SVG Map</span>
         </div>
 
         {hoveredRegion !== null && (
           <div
-            className="fixed px-3 py-1.5 rounded-md bg-slate-800 text-white text-xs font-semibold pointer-events-none shadow-lg z-50"
+            className="fixed px-3 py-1.5 rounded-md bg-black text-white text-xs font-semibold uppercase tracking-wide pointer-events-none shadow-lg border border-white/15 z-50"
             style={{
               left: `${mousePos.x + 20}px`,
               top: `${mousePos.y + 20}px`,
