@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 type MapItem = { name: string; src: string; displayName: string }
@@ -39,12 +39,37 @@ const svgStyles = `
   }
 `
 
-export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true, label = 'Select Map' }: Props) {
+const regionNames: Record<number, string> = {
+  0: 'AMINA',
+  1: 'OROMIA',
+  2: 'SOMALIA',
+  3: 'OMAR',
+  4: 'SNNPE',
+  5: 'AFAR',
+  6: 'TIGRAY',
+  7: 'BENSHANGUL',
+  8: 'GAMBELA',
+  9: 'HODAN',
+  10: 'MUSA',
+  11: 'NURA',
+  12: 'ALI',
+  13: 'SOFIA',
+  14: 'ADDIS ABEBA',
+  15: 'KHADIJA',
+  16: 'FARAH',
+  17: 'ZAINAB',
+  18: 'HUSSEIN',
+  19: 'MUNA',
+  20: 'ADAN',
+}
+
+const getRegionName = (index: number) => regionNames[index] ?? `Section ${index + 1}`
+
+export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
   const svgContainerRef = useRef<HTMLDivElement | null>(null)
   const [selectedRegion, setSelectedRegion] = useState<number | null>(null)
   const [hoveredRegion, setHoveredRegion] = useState<number | null>(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const cleanupRef = useRef<Array<{ el: Element; click: EventListenerOrEventListenerObject; keydown: EventListenerOrEventListenerObject; mouseover: EventListenerOrEventListenerObject; mouseout: EventListenerOrEventListenerObject; prevStroke?: string | null; prevStrokeWidth?: string | null; prevOpacity?: string | null }>>([])
 
   useEffect(() => {
     const container = svgContainerRef.current
@@ -61,9 +86,9 @@ export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true
       svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
       
       // Inject styles into SVG
-      let style = svg.querySelector('style')
+      let style = svg.querySelector('style') as HTMLStyleElement | null
       if (!style) {
-        style = document.createElementNS('http://www.w3.org/2000/svg', 'style')
+        style = document.createElement('style')
         svg.prepend(style)
       }
       style.textContent = svgStyles
@@ -72,8 +97,7 @@ export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true
     const regionSelector = 'path, rect, polygon, circle, g'
     const regions = Array.from(container.querySelectorAll(regionSelector)) as Element[]
 
-    const cleanup: Array<{ el: Element; click: EventListenerOrEventListenerObject; keydown: EventListenerOrEventListenerObject; prevStroke?: string | null; prevStrokeWidth?: string | null; prevOpacity?: string | null }> = []
-    cleanupRef.current = cleanup
+    const cleanup: Array<{ el: Element; click: EventListenerOrEventListenerObject; keydown: EventListenerOrEventListenerObject; mouseover: EventListenerOrEventListenerObject; mouseout: EventListenerOrEventListenerObject; prevStroke?: string | null; prevStrokeWidth?: string | null; prevOpacity?: string | null }> = []
 
     const mapName = 'map'
 
@@ -120,10 +144,11 @@ export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true
         onRegionSelect?.({ map: mapName, regionIndex: i })
       }
 
-      const handleKey = (ev: KeyboardEvent) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault()
-          handleClick(ev as unknown as Event)
+      const handleKey: EventListener = (ev) => {
+        const keyboardEvent = ev as KeyboardEvent
+        if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') {
+          keyboardEvent.preventDefault()
+          handleClick(keyboardEvent)
         }
       }
 
@@ -184,18 +209,18 @@ export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true
         {selectedRegion !== null && (
           <div className="px-3 py-2 rounded-md bg-blue-100 dark:bg-blue-950 border border-blue-300 dark:border-blue-700 animate-in fade-in slide-in-from-top-2 duration-300">
             <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-              region{selectedRegion + 1}
+              {getRegionName(selectedRegion)}
             </span>
           </div>
         )}
       </label>
 
-      <div className="relative w-full h-96 rounded-lg border border-border overflow-hidden bg-muted/30 flex items-center justify-center">
+      <div className="relative w-full max-w-[30vw] overflow-hidden flex items-center justify-center">
         <div ref={svgContainerRef} className="w-full h-full" />
 
         <div className={cn(
           "absolute left-3 top-3 px-2.5 py-1.5 rounded-md bg-black/40 backdrop-blur-sm transition-all duration-300",
-          selectedRegion !== null ? "opacity-0 pointer-events-none" : "opacity-100"
+          selectedRegion !== null || hoveredRegion !== null ? "opacity-0 pointer-events-none" : "opacity-100"
         )}>
           <span className="text-xs font-medium text-white">SVG Map</span>
         </div>
@@ -209,7 +234,7 @@ export function KewtiMap({ initial, onChange, onRegionSelect, showPreview = true
               animation: 'fadeIn 0.15s ease-out',
             }}
           >
-            region{hoveredRegion + 1}
+            {getRegionName(hoveredRegion)}
           </div>
         )}
       </div>
