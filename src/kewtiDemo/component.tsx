@@ -1,4 +1,5 @@
 import {KewtiInput} from "../kewti-inputs/component";
+import {KewtiMap} from "../kewti-maps/component";
 
 export default function KewtiDemo() {
     return (
@@ -6,6 +7,7 @@ export default function KewtiDemo() {
             <div className="mt-30">
                 <h1>A simple page for testing components</h1>
                 <KewtiInput variant="input" />
+                <KewtiMap />
             </div>
         </div>
     );
