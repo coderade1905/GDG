@@ -95,11 +95,12 @@ export function KewtiPassword({
 
             // Calculate angle to cursor
             const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX)
-            const distance = 8 // Max distance eyeballs can move within sockets
+            const maxHorizontal = 6 // Max horizontal distance
+            const maxVertical = 1.5 // Max vertical distance (reduced by half)
 
             setEyePosition({
-                x: Math.cos(angle) * distance,
-                y: Math.sin(angle) * distance,
+                x: Math.cos(angle) * maxHorizontal,
+                y: Math.sin(angle) * maxVertical,
             })
         }
 
@@ -131,7 +132,7 @@ export function KewtiPassword({
                         <div className="flex flex-col items-center gap-2 pb-2">
                             <div
                                 className={cn(
-                                    "relative flex h-40 w-40 items-center justify-center overflow-hidden rounded-3xl border-2 transition-all duration-300",
+                                    "relative flex h-80 w-80 items-center justify-center overflow-hidden rounded-3xl border-2 transition-all duration-300",
                                     focused
                                         ? "border-primary/30 shadow-lg shadow-primary/10"
                                         : "border-muted/40 shadow-sm",
@@ -154,7 +155,7 @@ export function KewtiPassword({
                                     <div
                                         className="absolute w-2 h-2 rounded-full bg-black border border-black shadow-md"
                                         style={{
-                                            left: "35%",
+                                            left: "40%",
                                             top: "50%",
                                             transform: `translate(${eyePosition.x}px, ${eyePosition.y}px)`,
                                             transition: "transform 0.1s ease-out",
@@ -167,7 +168,7 @@ export function KewtiPassword({
                                     <div
                                         className="absolute w-2 h-2 rounded-full bg-black border border-black shadow-md"
                                         style={{
-                                            right: "35%",
+                                            right: "40%",
                                             top: "50%",
                                             transform: `translate(${eyePosition.x}px, ${eyePosition.y}px)`,
                                             transition: "transform 0.1s ease-out",
