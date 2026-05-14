@@ -1,0 +1,247 @@
+"use client"
+
+import * as React from "react"
+import { cn } from "@/lib/utils"
+import { Eye, EyeOff, Lock, Check, X } from "lucide-react"
+
+/* ──────────────────────────────────────────────
+   Strength helpers
+   ────────────────────────────────────────────── */
+
+type StrengthLevel = 0 | 1 | 2 | 3 | 4
+
+interface StrengthRule {
+    label: string
+    test: (pw: string) => boolean
+}
+
+const RULES: StrengthRule[] = [
+    { label: "At least 8 characters", test: (pw) => pw.length >= 8 },
+    { label: "Uppercase letter", test: (pw) => /[A-Z]/.test(pw) },
+    { label: "Lowercase letter", test: (pw) => /[a-z]/.test(pw) },
+    { label: "Number", test: (pw) => /\d/.test(pw) },
+    { label: "Special character", test: (pw) => /[^A-Za-z0-9]/.test(pw) },
+]
+
+function getStrength(password: string): StrengthLevel {
+    if (!password) return 0
+    const passed = RULES.filter((r) => r.test(password)).length
+    if (passed <= 1) return 1
+    if (passed <= 2) return 2
+    if (passed <= 3) return 3
+    return 4
+}
+
+const STRENGTH_CONFIG: Record<
+    StrengthLevel,
+    { label: string; color: string; bgColor: string }
+> = {
+    0: { label: "", color: "", bgColor: "bg-muted" },
+    1: { label: "Weak", color: "text-red-500", bgColor: "bg-red-500" },
+    2: { label: "Fair", color: "text-amber-500", bgColor: "bg-amber-500" },
+    3: { label: "Good", color: "text-sky-500", bgColor: "bg-sky-500" },
+    4: { label: "Strong", color: "text-emerald-500", bgColor: "bg-emerald-500" },
+}
+
+/* ──────────────────────────────────────────────
+   Component
+   ────────────────────────────────────────────── */
+
+interface KewtiPasswordProps {
+    /** Placeholder text */
+    placeholder?: string
+    /** Show the strength meter & rule checklist */
+    showStrength?: boolean
+    /** External change handler */
+    onChange?: (value: string) => void
+    /** Controlled value */
+    value?: string
+    /** Label text above the input */
+    label?: string
+    /** Extra wrapper classes */
+    className?: string
+    /** Slot for a mascot or illustration above the input */
+    mascot?: React.ReactNode
+}
+
+export function KewtiPassword({
+    placeholder = "Enter password",
+    showStrength = true,
+    onChange,
+    value: controlledValue,
+    label = "Password",
+    className,
+    mascot,
+}: KewtiPasswordProps) {
+    const [internalValue, setInternalValue] = React.useState("")
+    const [visible, setVisible] = React.useState(false)
+    const [focused, setFocused] = React.useState(false)
+
+    const password = controlledValue ?? internalValue
+    const strength = getStrength(password)
+    const config = STRENGTH_CONFIG[strength]
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const next = e.target.value
+        if (controlledValue === undefined) setInternalValue(next)
+        onChange?.(next)
+    }
+
+    return (
+        <div className={cn("mx-auto w-full max-w-sm", className)}>
+            {/* ── Mascot Zone ───────────────────────── */}
+            <div className="flex items-end justify-center">
+                <div
+                    className={cn(
+                        "relative mb-[-1px] flex items-end justify-center transition-transform duration-300",
+                        focused && "scale-105",
+                    )}
+                >
+                    {mascot ? (
+                        mascot
+                    ) : (
+                        /* Default placeholder – a friendly lock illustration */
+                        <div className="flex flex-col items-center gap-1 pb-2">
+                            <div
+                                className={cn(
+                                    "flex h-16 w-16 items-center justify-center rounded-2xl border-2 transition-all duration-300",
+                                    focused
+                                        ? "border-primary bg-primary/10 shadow-lg shadow-primary/5"
+                                        : "border-border bg-muted/50",
+                                )}
+                            >
+                                <Lock
+                                    className={cn(
+                                        "h-7 w-7 transition-all duration-300",
+                                        focused
+                                            ? "text-primary"
+                                            : "text-muted-foreground",
+                                        visible && focused && "rotate-12",
+                                    )}
+                                />
+                            </div>
+                            {/* little tab that connects to the card */}
+                            <div
+                                className={cn(
+                                    "h-2 w-10 rounded-t-md transition-colors duration-300",
+                                    focused ? "bg-primary/10" : "bg-muted/50",
+                                )}
+                            />
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* ── Card ──────────────────────────────── */}
+            <div
+                className={cn(
+                    "rounded-2xl border bg-background p-5 shadow-sm transition-all duration-300",
+                    focused
+                        ? "border-primary/30 shadow-md shadow-primary/5 ring-1 ring-primary/10"
+                        : "border-border",
+                )}
+            >
+                {/* Label */}
+                {label && (
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                        {label}
+                    </label>
+                )}
+
+                {/* Input row */}
+                <div className="relative">
+                    <input
+                        id="kewti-password-input"
+                        type={visible ? "text" : "password"}
+                        value={password}
+                        onChange={handleChange}
+                        onFocus={() => setFocused(true)}
+                        onBlur={() => setFocused(false)}
+                        placeholder={placeholder}
+                        autoComplete="new-password"
+                        className={cn(
+                            "peer h-11 w-full rounded-xl border bg-transparent px-4 pr-12 text-sm outline-none transition-all duration-200",
+                            "placeholder:text-muted-foreground/60",
+                            "border-input focus:border-primary focus:ring-2 focus:ring-primary/20",
+                            "dark:bg-input/20",
+                        )}
+                    />
+
+                    {/* Toggle visibility */}
+                    <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={() => setVisible((v) => !v)}
+                        aria-label={visible ? "Hide password" : "Show password"}
+                        className={cn(
+                            "absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-muted-foreground transition-colors",
+                            "hover:bg-muted hover:text-foreground",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
+                        )}
+                    >
+                        {visible ? (
+                            <EyeOff className="h-4 w-4" />
+                        ) : (
+                            <Eye className="h-4 w-4" />
+                        )}
+                    </button>
+                </div>
+
+                {/* ── Strength meter ───────────────── */}
+                {showStrength && password.length > 0 && (
+                    <div className="mt-4 animate-in fade-in slide-in-from-top-1 duration-300">
+                        {/* Bar */}
+                        <div className="mb-2 flex items-center gap-2">
+                            <div className="flex flex-1 gap-1">
+                                {([1, 2, 3, 4] as const).map((level) => (
+                                    <div
+                                        key={level}
+                                        className={cn(
+                                            "h-1.5 flex-1 rounded-full transition-all duration-500",
+                                            strength >= level
+                                                ? config.bgColor
+                                                : "bg-muted",
+                                        )}
+                                    />
+                                ))}
+                            </div>
+                            <span
+                                className={cn(
+                                    "text-[11px] font-medium tabular-nums tracking-wide transition-colors duration-300",
+                                    config.color,
+                                )}
+                            >
+                                {config.label}
+                            </span>
+                        </div>
+
+                        {/* Rule checklist */}
+                        <ul className="space-y-1">
+                            {RULES.map((rule) => {
+                                const passed = rule.test(password)
+                                return (
+                                    <li
+                                        key={rule.label}
+                                        className={cn(
+                                            "flex items-center gap-1.5 text-[11px] transition-colors duration-200",
+                                            passed
+                                                ? "text-emerald-500"
+                                                : "text-muted-foreground/70",
+                                        )}
+                                    >
+                                        {passed ? (
+                                            <Check className="h-3 w-3" />
+                                        ) : (
+                                            <X className="h-3 w-3" />
+                                        )}
+                                        {rule.label}
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}

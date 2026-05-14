@@ -1,5 +1,6 @@
-import {KewtiInput} from "../kewti-inputs/component";
-import {KewtiMap} from "../kewti-maps/component";
+import { KewtiInput } from "../kewti-inputs/component";
+import { KewtiMap } from "../kewti-maps/component";
+import { KewtiPassword } from "../kewti-passwords/component";
 
 export default function KewtiDemo() {
     return (
@@ -8,6 +9,7 @@ export default function KewtiDemo() {
                 <h1>A simple page for testing components</h1>
                 <KewtiInput variant="input" />
                 <KewtiMap />
+                <KewtiPassword />
             </div>
         </div>
     );
