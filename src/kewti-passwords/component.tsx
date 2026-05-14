@@ -96,7 +96,7 @@ export function KewtiPassword({
             // Calculate angle to cursor
             const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX)
             const maxHorizontal = 6 // Max horizontal distance
-            const maxVertical = 1.5 // Max vertical distance (reduced by half)
+            const maxVertical = 3 // Max vertical distance
 
             setEyePosition({
                 x: Math.cos(angle) * maxHorizontal,
@@ -145,7 +145,7 @@ export function KewtiPassword({
                                     className="h-full w-full object-cover transition-transform duration-300"
                                     loading="lazy"
                                 />
-                                
+
                                 {/* Eyes Container with tracking eyeballs */}
                                 <div
                                     className="absolute inset-0 pointer-events-none"
@@ -156,7 +156,7 @@ export function KewtiPassword({
                                         className="absolute w-2 h-2 rounded-full bg-black border border-black shadow-md"
                                         style={{
                                             left: "40%",
-                                            top: "50%",
+                                            top: "52%",
                                             transform: `translate(${eyePosition.x}px, ${eyePosition.y}px)`,
                                             transition: "transform 0.1s ease-out",
                                         }}
@@ -169,7 +169,7 @@ export function KewtiPassword({
                                         className="absolute w-2 h-2 rounded-full bg-black border border-black shadow-md"
                                         style={{
                                             right: "40%",
-                                            top: "50%",
+                                            top: "52%",
                                             transform: `translate(${eyePosition.x}px, ${eyePosition.y}px)`,
                                             transition: "transform 0.1s ease-out",
                                         }}
