@@ -77,10 +77,35 @@ export function KewtiPassword({
     const [internalValue, setInternalValue] = React.useState("")
     const [visible, setVisible] = React.useState(false)
     const [focused, setFocused] = React.useState(false)
+    const [eyePosition, setEyePosition] = React.useState({ x: 0, y: 0 })
+    const mascotRef = React.useRef<HTMLDivElement>(null)
 
     const password = controlledValue ?? internalValue
     const strength = getStrength(password)
     const config = STRENGTH_CONFIG[strength]
+
+    // Eye tracking effect
+    React.useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!mascotRef.current) return
+
+            const rect = mascotRef.current.getBoundingClientRect()
+            const centerX = rect.left + rect.width / 2
+            const centerY = rect.top + rect.height / 2
+
+            // Calculate angle to cursor
+            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX)
+            const distance = 8 // Max distance eyeballs can move within sockets
+
+            setEyePosition({
+                x: Math.cos(angle) * distance,
+                y: Math.sin(angle) * distance,
+            })
+        }
+
+        window.addEventListener("mousemove", handleMouseMove)
+        return () => window.removeEventListener("mousemove", handleMouseMove)
+    }, [])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const next = e.target.value
@@ -97,6 +122,7 @@ export function KewtiPassword({
                         "relative -mb-px flex items-end justify-center transition-transform duration-300",
                         focused && "scale-105",
                     )}
+                    ref={mascotRef}
                 >
                     {mascot ? (
                         mascot
@@ -111,21 +137,45 @@ export function KewtiPassword({
                                         : "border-muted/40 shadow-sm",
                                 )}
                             >
-                                {/* Mascot Image Container - eyes positioned for future tracking */}
+                                {/* Mascot Image Container */}
                                 <img
                                     src={mascotImage}
                                     alt="Mascot"
                                     className="h-full w-full object-cover transition-transform duration-300"
                                     loading="lazy"
                                 />
-                                {/* Eye tracking overlay container (reserved for interactive elements) */}
+                                
+                                {/* Eyes Container with tracking eyeballs */}
                                 <div
-                                    className={cn(
-                                        "absolute inset-0 pointer-events-none transition-opacity duration-300",
-                                        focused ? "opacity-0" : "opacity-0",
-                                    )}
+                                    className="absolute inset-0 pointer-events-none"
                                     data-eyes-container="true"
-                                />
+                                >
+                                    {/* Left Eye */}
+                                    <div
+                                        className="absolute w-2 h-2 rounded-full bg-black border border-black shadow-md"
+                                        style={{
+                                            left: "35%",
+                                            top: "50%",
+                                            transform: `translate(${eyePosition.x}px, ${eyePosition.y}px)`,
+                                            transition: "transform 0.1s ease-out",
+                                        }}
+                                    >
+                                        <div className="absolute w-0.5 h-0.5 bg-white rounded-full" style={{ top: "2px", left: "2px" }} />
+                                    </div>
+
+                                    {/* Right Eye */}
+                                    <div
+                                        className="absolute w-2 h-2 rounded-full bg-black border border-black shadow-md"
+                                        style={{
+                                            right: "35%",
+                                            top: "50%",
+                                            transform: `translate(${eyePosition.x}px, ${eyePosition.y}px)`,
+                                            transition: "transform 0.1s ease-out",
+                                        }}
+                                    >
+                                        <div className="absolute w-0.5 h-0.5 bg-white rounded-full" style={{ top: "2px", left: "2px" }} />
+                                    </div>
+                                </div>
                             </div>
                             {/* little tab that connects to the card */}
                             <div
