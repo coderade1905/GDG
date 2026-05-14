@@ -458,7 +458,7 @@ async function fetchFromProxySource(reference: string, proxyUrl: string): Promis
 }
 
 export async function verifyTelebirr(reference: string): Promise<TelebirrReceipt | null> {
-    const primaryUrl = "https://transactioninfo.ethiotelecom.et/receipt/";
+    const primaryUrl = "/api/telebirr/receipt/";
 
 
     const envProxies = "" //import.meta.env.VITE_FALLBACK_PROXIES || "";
