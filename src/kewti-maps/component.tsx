@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+
 import { cn } from '@/lib/utils'
 
 type MapItem = { name: string; src: string; displayName: string }
@@ -9,7 +10,17 @@ type Props = {
   onRegionSelect?: (info: { map: string; regionIndex: number }) => void
   showPreview?: boolean
   label?: string
-  theme?: ThemeName | Partial<Theme>  // Preset or custom override
+}
+
+type MapSection = {
+  id: string
+  name: string
+  svgIndex: number
+}
+
+type RegionNode = {
+  section: MapSection
+  element: SVGElement
 }
 
 // Import the SVG as raw text (Vite `?raw`). If TypeScript complains, the tsconfig
@@ -17,270 +28,206 @@ type Props = {
 // @ts-ignore
 import mapRaw from './maps/map.svg?raw'
 
-// Add styles for SVG animations
-const svgStyles = (theme: Theme) => `
-  [data-region-index] {
-    fill: ${theme.fillColor};
-    transition: opacity 0.3s ease, transform 0.3s ease, stroke 0.3s ease;
+const sections: MapSection[] = [
+  { id: 'oromia', name: 'OROMIA', svgIndex: 1 },
+  { id: 'somalia', name: 'SOMALIA', svgIndex: 2 },
+  { id: 'amhara', name: 'AMHARA', svgIndex: 3 },
+  { id: 'south', name: 'SNNPE', svgIndex: 4 },
+  { id: 'afar', name: 'AFAR', svgIndex: 5 },
+  { id: 'tigray', name: 'TIGRAY', svgIndex: 6 },
+  { id: 'benshangul', name: 'BENSHANGUL', svgIndex: 7 },
+  { id: 'gambela', name: 'GAMBELA', svgIndex: 8 },
+  { id: 'addis', name: 'ADDIS ABEBA', svgIndex: 14 },
+]
+
+const sectionById = new Map(sections.map((section) => [section.id, section]))
+
+const svgStyleText = `
+  [data-kewti-map-section] {
+    fill: #f5f5f5;
+    transition: opacity 180ms ease, transform 180ms ease, stroke 180ms ease, stroke-width 180ms ease;
     transform-origin: center;
+    cursor: pointer;
   }
-  [data-kewti-selected] {
-    stroke: ${theme.borderColor};
-    animation: zoomIn 0.4s ease-out forwards;
+  [data-kewti-map-section][data-kewti-selected="true"] {
+    stroke: #111111;
+    stroke-width: 6;
+    opacity: 1;
   }
-  [data-region-index]:hover:not([data-kewti-selected]) {
-    opacity: 0.8 !important;
-    transform: scale(1.01);
-    stroke: ${theme.hoverColor};
+  [data-kewti-map-section][data-kewti-hovered="true"]:not([data-kewti-selected="true"]) {
+    opacity: 0.88;
+    stroke: #3b82f6;
+    stroke-width: 3;
   }
 `
 
-const regionDefinitions: Array<{ svgIndex: number; name: string }> = [
-  { svgIndex: 1, name: 'OROMIA' },
-  { svgIndex: 2, name: 'SOMALIA' },
-  { svgIndex: 3, name: 'AMHARA' },
-  { svgIndex: 4, name: 'SNNPE' },
-  { svgIndex: 5, name: 'AFAR' },
-  { svgIndex: 6, name: 'TIGRAY' },
-  { svgIndex: 7, name: 'BENSHANGUL' },
-  { svgIndex: 8, name: 'GAMBELA' },
-  { svgIndex: 14, name: 'ADDIS ABEBA' },
-] 
-
-const regionDefinitionMap = new Map(regionDefinitions.map((region) => [region.svgIndex, region.name]))
-
-const getRegionName = (index: number) => regionDefinitionMap.get(index) ?? ''
-
-// Define theme types and presets
-type Theme = {
-  selectedColor: string
-  hoverColor: string
-  borderColor: string
-  fillColor: string
-  textColor: string
-  backgroundColor: string
-  borderWidth: number
-}
-
-type ThemeName = 'dark' | 'light' | 'green' | 'blue'
-
-const THEMES: Record<ThemeName, Theme> = {
-  dark: {
-    selectedColor: '#111111',
-    hoverColor: '#333333',
-    borderColor: '#ffffff',
-    fillColor: '#1a1a1a',
-    textColor: '#ffffff',
-    backgroundColor: '#000000',
-    borderWidth: 6,
-  },
-  light: {
-    selectedColor: '#ffffff',
-    hoverColor: '#f0f0f0',
-    borderColor: '#000000',
-    fillColor: '#f5f5f5',
-    textColor: '#000000',
-    backgroundColor: '#ffffff',
-    borderWidth: 6,
-  },
-  green: {
-    selectedColor: '#10b981',
-    hoverColor: '#d1fae5',
-    borderColor: '#059669',
-    fillColor: '#ecfdf5',
-    textColor: '#065f46',
-    backgroundColor: '#f0fdf4',
-    borderWidth: 6,
-  },
-  blue: {
-    selectedColor: '#3b82f6',
-    hoverColor: '#dbeafe',
-    borderColor: '#1d4ed8',
-    fillColor: '#eff6ff',
-    textColor: '#1e40af',
-    backgroundColor: '#f8fafc',
-    borderWidth: 6,
-  },
-}
-
 export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
   const svgContainerRef = useRef<HTMLDivElement | null>(null)
-  const [selectedRegion, setSelectedRegion] = useState<number | null>(null)
-  const [hoveredRegion, setHoveredRegion] = useState<number | null>(null)
+  const regionNodesRef = useRef<RegionNode[]>([])
+  const onRegionSelectRef = useRef<Props['onRegionSelect']>(onRegionSelect)
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null)
+  const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+
+  const selectedSection = selectedSectionId ? sectionById.get(selectedSectionId) : undefined
+  const hoveredSection = hoveredSectionId ? sectionById.get(hoveredSectionId) : undefined
+
+  useEffect(() => {
+    onRegionSelectRef.current = onRegionSelect
+  }, [onRegionSelect])
 
   useEffect(() => {
     const container = svgContainerRef.current
     if (!container) return
 
-    // Inline the raw SVG markup
     container.innerHTML = mapRaw || ''
 
-    // Add styles to SVG
-    const svg = container.querySelector('svg') as SVGElement | null
-    if (svg) {
-      svg.style.width = '100%'
-      svg.style.height = '100%'
-      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
-      
-      // Inject styles into SVG
-      let style = svg.querySelector('style') as HTMLStyleElement | null
-      if (!style) {
-        style = document.createElement('style')
-        svg.prepend(style)
-      }
-      style.textContent = svgStyles
+    const svg = container.querySelector('svg') as SVGSVGElement | null
+    if (!svg) return
+
+    svg.style.width = '100%'
+    svg.style.height = '100%'
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+
+    let style = svg.querySelector('style') as HTMLStyleElement | null
+    if (!style) {
+      style = document.createElement('style')
+      svg.prepend(style)
+    }
+    style.textContent = svgStyleText
+
+    const regionElements = Array.from(svg.querySelectorAll('path, rect, polygon, circle, g')) as SVGElement[]
+    const cleanup: Array<() => void> = []
+
+    const resolvedNodes = sections
+      .map((section) => {
+        const element = regionElements[section.svgIndex]
+        return element ? ({ section, element } as RegionNode) : null
+      })
+      .filter((node): node is RegionNode => node !== null)
+
+    regionNodesRef.current = resolvedNodes
+
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePos({ x: event.clientX, y: event.clientY })
     }
 
-    const regionSelector = 'path, rect, polygon, circle, g'
-    const regions = Array.from(container.querySelectorAll(regionSelector)) as Element[]
+    svg.addEventListener('mousemove', handleMouseMove)
 
-    const cleanup: Array<{ el: Element; click: EventListenerOrEventListenerObject; keydown: EventListenerOrEventListenerObject; mouseover: EventListenerOrEventListenerObject; mouseout: EventListenerOrEventListenerObject; prevStroke?: string | null; prevStrokeWidth?: string | null; prevOpacity?: string | null }> = []
-    const interactiveRegionIndices = new Set<number>(regionDefinitions.map((region) => region.svgIndex))
+    resolvedNodes.forEach(({ section, element }) => {
+      element.setAttribute('data-kewti-map-section', section.id)
+      element.setAttribute('role', 'button')
+      element.setAttribute('tabindex', '0')
+      element.setAttribute('aria-label', section.name)
+      element.setAttribute('pointer-events', 'auto')
 
-    const mapName = 'map'
-
-    regions.forEach((el, svgIndex) => {
-      const isInteractive = interactiveRegionIndices.has(svgIndex)
-
-      if (!isInteractive) {
-        ;(el as HTMLElement).style.pointerEvents = 'none'
-        return
+      const handleClick: EventListener = (event) => {
+        event.stopPropagation()
+        setSelectedSectionId(section.id)
+        onRegionSelectRef.current?.({ map: 'map', regionIndex: section.svgIndex })
       }
 
-      el.setAttribute('data-region-index', String(svgIndex))
-      el.setAttribute('role', 'button')
-      el.setAttribute('tabindex', '0')
-      ;(el as HTMLElement).style.cursor = 'pointer'
-
-      const prevStroke = el.getAttribute('stroke')
-      const prevStrokeWidth = el.getAttribute('stroke-width')
-      const prevOpacity = el.getAttribute('opacity')
-
-      const handleClick = (e: Event) => {
-        e.stopPropagation()
-
-        // Clear previous highlight and reset all regions
-        cleanup.forEach((r) => {
-          if (r.prevStroke != null) r.el.setAttribute('stroke', r.prevStroke)
-          else r.el.removeAttribute('stroke')
-          if (r.prevStrokeWidth != null) r.el.setAttribute('stroke-width', r.prevStrokeWidth)
-          else r.el.removeAttribute('stroke-width')
-          if (r.prevOpacity != null) r.el.setAttribute('opacity', r.prevOpacity)
-          else r.el.setAttribute('opacity', '1')
-          r.el.removeAttribute('data-kewti-selected')
-          // Reset transform
-          ;(r.el as SVGElement).style.transform = 'scale(1)'
-        })
-
-        // Apply highlight to the clicked element
-        el.setAttribute('data-kewti-selected', 'true')
-        el.setAttribute('stroke', '#111111')
-        el.setAttribute('stroke-width', '6')
-        el.setAttribute('opacity', '1')
-
-        // Dim all other regions with smooth transition
-        cleanup.forEach((r) => {
-          if (r.el !== el) {
-            r.el.setAttribute('opacity', '0.3')
-          }
-        })
-
-        setSelectedRegion(svgIndex)
-        onRegionSelect?.(getRegionName(svgIndex))  // Pass just the name
-      }
-
-      const handleKey: EventListener = (ev) => {
-        const keyboardEvent = ev as KeyboardEvent
+      const handleKeyDown: EventListener = (event) => {
+        const keyboardEvent = event as KeyboardEvent
         if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') {
           keyboardEvent.preventDefault()
           handleClick(keyboardEvent)
         }
       }
 
-      const handleMouseOver = (event: Event) => {
-        const target = event.currentTarget as Element
-        const regionIndex = target.getAttribute('data-region-index')
-        if (regionIndex !== null) {
-          setHoveredRegion(parseInt(regionIndex, 10))
-        }
+      const handleMouseEnter = () => {
+        setHoveredSectionId(section.id)
       }
 
-      const handleMouseOut = () => {
-        setHoveredRegion(null)
+      const handleMouseLeave = () => {
+        setHoveredSectionId((current) => (current === section.id ? null : current))
       }
 
-      el.addEventListener('click', handleClick)
-      el.addEventListener('keydown', handleKey as EventListener)
-      el.addEventListener('mouseenter', handleMouseOver)
-      el.addEventListener('mouseleave', handleMouseOut)
+      element.addEventListener('click', handleClick)
+      element.addEventListener('keydown', handleKeyDown)
+      element.addEventListener('mouseenter', handleMouseEnter)
+      element.addEventListener('mouseleave', handleMouseLeave)
 
-      cleanup.push({ el, click: handleClick, keydown: handleKey, mouseover: handleMouseOver, mouseout: handleMouseOut, prevStroke, prevStrokeWidth, prevOpacity })
+      cleanup.push(() => {
+        element.removeEventListener('click', handleClick)
+        element.removeEventListener('keydown', handleKeyDown)
+        element.removeEventListener('mouseenter', handleMouseEnter)
+        element.removeEventListener('mouseleave', handleMouseLeave)
+      })
     })
 
-    // Add mousemove listener to track cursor position
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({
-        x: e.clientX,
-        y: e.clientY,
-      })
-    }
-
-    container.addEventListener('mousemove', handleMouseMove)
-
     return () => {
-      container.removeEventListener('mousemove', handleMouseMove)
-      cleanup.forEach((r) => {
-        r.el.removeEventListener('click', r.click)
-        r.el.removeEventListener('keydown', r.keydown as EventListener)
-        r.el.removeEventListener('mouseenter', r.mouseover)
-        r.el.removeEventListener('mouseleave', r.mouseout)
-        if (r.el.getAttribute('data-kewti-selected') === 'true') {
-          if (r.prevStroke != null) r.el.setAttribute('stroke', r.prevStroke)
-          else r.el.removeAttribute('stroke')
-          if (r.prevStrokeWidth != null) r.el.setAttribute('stroke-width', r.prevStrokeWidth)
-          else r.el.removeAttribute('stroke-width')
-          if (r.prevOpacity != null) r.el.setAttribute('opacity', r.prevOpacity)
-          else r.el.setAttribute('opacity', '1')
-          r.el.removeAttribute('data-kewti-selected')
-        }
-      })
+      svg.removeEventListener('mousemove', handleMouseMove)
+      cleanup.forEach((dispose) => dispose())
+      regionNodesRef.current = []
     }
   }, [])
 
+  useEffect(() => {
+    regionNodesRef.current.forEach(({ section, element }) => {
+      const isSelected = section.id === selectedSectionId
+      const isHovered = section.id === hoveredSectionId
+
+      element.setAttribute('data-kewti-selected', isSelected ? 'true' : 'false')
+      element.setAttribute('data-kewti-hovered', isHovered ? 'true' : 'false')
+
+      if (selectedSectionId && !isSelected) {
+        element.setAttribute('opacity', '0.28')
+      } else {
+        element.setAttribute('opacity', '1')
+      }
+
+      if (isSelected) {
+        element.setAttribute('stroke', '#111111')
+        element.setAttribute('stroke-width', '6')
+      } else if (isHovered) {
+        element.setAttribute('stroke', '#3b82f6')
+        element.setAttribute('stroke-width', '3')
+      } else {
+        element.removeAttribute('stroke')
+        element.removeAttribute('stroke-width')
+      }
+    })
+  }, [hoveredSectionId, selectedSectionId])
+
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex w-full flex-col gap-4">
       <label className="flex flex-col gap-3">
         <span className="text-sm font-medium text-foreground">{label}</span>
-        {selectedRegion !== null && (
-          <div className="px-3 py-2 rounded-md bg-black text-white border border-white/15 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-            <span className="text-sm font-semibold tracking-wide uppercase text-white">
-              {getRegionName(selectedRegion)}
+        {selectedSection ? (
+          <div className="animate-in fade-in slide-in-from-top-2 duration-300 rounded-md border border-white/15 bg-black px-3 py-2 text-white shadow-sm">
+            <span className="text-sm font-semibold uppercase tracking-wide text-white">
+              {selectedSection.name}
             </span>
+          </div>
+        ) : (
+          <div className="rounded-md border border-dashed border-border bg-muted/20 px-3 py-2 text-sm text-muted-foreground">
+            Click a section on the map to select it.
           </div>
         )}
       </label>
 
-      <div className="relative w-full max-w-[30vw] overflow-hidden flex items-center justify-center">
-        <div ref={svgContainerRef} className="w-full h-full" />
+      <div className="relative flex w-full max-w-[30vw] items-center justify-center overflow-hidden">
+        <div ref={svgContainerRef} className="h-full w-full" />
 
-        <div className={cn(
-          "absolute left-3 top-3 px-2.5 py-1.5 rounded-md bg-black text-white border border-white/10 backdrop-blur-sm transition-all duration-300",
-          selectedRegion !== null || hoveredRegion !== null ? "opacity-0 pointer-events-none" : "opacity-100"
-        )}>
+        <div
+          className={cn(
+            'absolute left-3 top-3 rounded-md border border-white/10 bg-black px-2.5 py-1.5 text-white backdrop-blur-sm transition-all duration-300',
+            selectedSection || hoveredSection ? 'pointer-events-none opacity-0' : 'opacity-100'
+          )}
+        >
           <span className="text-xs font-medium uppercase tracking-wider text-white">SVG Map</span>
         </div>
 
-        {hoveredRegion !== null && (
+        {hoveredSection && hoveredSectionId !== selectedSectionId && (
           <div
-            className="fixed px-3 py-1.5 rounded-md bg-black text-white text-xs font-semibold uppercase tracking-wide pointer-events-none shadow-lg border border-white/15 z-50"
+            className="pointer-events-none fixed z-50 rounded-md border border-white/15 bg-black px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white shadow-lg"
             style={{
               left: `${mousePos.x + 20}px`,
               top: `${mousePos.y + 20}px`,
-              animation: 'fadeIn 0.15s ease-out',
             }}
           >
-            {getRegionName(hoveredRegion)}
+            {hoveredSection.name}
           </div>
         )}
       </div>
