@@ -3,6 +3,8 @@ import {KewtiInput} from "../kewti-inputs/component";
 import {KewtiMap} from "../kewti-maps/component";
 import TransactionValidator from "../kewti-banks/component";
 import {KewtiLocationSelector} from "../kewti-inputs/location_selector";
+import {KewtiPassword} from "../kewti-passwords/component";
+
 export default function KewtiDemo() {
     return (
         <div className="h-full w-full flex items-center justify-center">
@@ -14,6 +16,7 @@ export default function KewtiDemo() {
                 <h1>Gregorian - Habeshan Calendar Component</h1>
                 <EthiopianCalendar />
                 <KewtiLocationSelector />
+                <KewtiPassword />
             </div>
         </div>
     );
