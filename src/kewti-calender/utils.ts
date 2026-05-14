@@ -57,3 +57,8 @@ export function toGregorianDate(day: number, month: number, year: number): Date 
 
   return result
 }
+
+export function getEthiopianMonthStartDay(month: number, year: number): number {
+  const gcDate = toGregorianDate(1, month, year)
+  return gcDate.getDay()
+}
