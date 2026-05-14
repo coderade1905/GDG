@@ -4,6 +4,8 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Eye, EyeOff, Check, X } from "lucide-react"
 import mascotImage from "./mascot.png"
+import handLeftImage from "./hand-left.png"
+import handRightImage from "./hand-right.png"
 
 /* ──────────────────────────────────────────────
    Strength helpers
@@ -130,14 +132,7 @@ export function KewtiPassword({
                     ) : (
                         /* Mascot illustration with eyes ready for interactivity */
                         <div className="flex flex-col items-center gap-2 pb-2">
-                            <div
-                                className={cn(
-                                    "relative flex h-80 w-80 items-center justify-center overflow-hidden rounded-3xl border-2 transition-all duration-300",
-                                    focused
-                                        ? "border-primary/30 shadow-lg shadow-primary/10"
-                                        : "border-muted/40 shadow-sm",
-                                )}
-                            >
+                            <div className="relative flex h-80 w-80 items-center justify-center overflow-hidden rounded-3xl transition-all duration-300">
                                 {/* Mascot Image Container */}
                                 <img
                                     src={mascotImage}
@@ -157,7 +152,7 @@ export function KewtiPassword({
                                         style={{
                                             left: "40%",
                                             top: "52%",
-                                            transform: `translate(${eyePosition.x}px, ${eyePosition.y}px)`,
+                                            transform: `translate(${eyePosition.x}px, ${eyePosition.y}px) scale(1.05)`,
                                             transition: "transform 0.1s ease-out",
                                         }}
                                     >
@@ -170,13 +165,41 @@ export function KewtiPassword({
                                         style={{
                                             right: "40%",
                                             top: "52%",
-                                            transform: `translate(${eyePosition.x}px, ${eyePosition.y}px)`,
+                                            transform: `translate(${eyePosition.x}px, ${eyePosition.y}px) scale(1.05)`,
                                             transition: "transform 0.1s ease-out",
                                         }}
                                     >
                                         <div className="absolute w-0.5 h-0.5 bg-white rounded-full" style={{ top: "2px", left: "2px" }} />
                                     </div>
                                 </div>
+
+                                {/* Hands covering eyes when password is hidden */}
+                                <img
+                                    src={handLeftImage}
+                                    alt=""
+                                    className="absolute pointer-events-none"
+                                    style={{
+                                        width: "28%",
+                                        top: "48%",
+                                        left: visible ? "-30%" : "26%",
+                                        transform: "translateY(-50%) rotate(10deg) scale(0.9)",
+                                        transition: "left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                                        zIndex: 10,
+                                    }}
+                                />
+                                <img
+                                    src={handRightImage}
+                                    alt=""
+                                    className="absolute pointer-events-none"
+                                    style={{
+                                        width: "28%",
+                                        top: "48%",
+                                        right: visible ? "-30%" : "26%",
+                                        transform: "translateY(-50%) rotate(-10deg) scale(0.9)",
+                                        transition: "right 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                                        zIndex: 10,
+                                    }}
+                                />
                             </div>
                             {/* little tab that connects to the card */}
                             <div
