@@ -2,7 +2,8 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Eye, EyeOff, Lock, Check, X } from "lucide-react"
+import { Eye, EyeOff, Check, X } from "lucide-react"
+import mascotImage from "./mascot.png"
 
 /* ──────────────────────────────────────────────
    Strength helpers
@@ -93,38 +94,44 @@ export function KewtiPassword({
             <div className="flex items-end justify-center">
                 <div
                     className={cn(
-                        "relative mb-[-1px] flex items-end justify-center transition-transform duration-300",
+                        "relative -mb-px flex items-end justify-center transition-transform duration-300",
                         focused && "scale-105",
                     )}
                 >
                     {mascot ? (
                         mascot
                     ) : (
-                        /* Default placeholder – a friendly lock illustration */
-                        <div className="flex flex-col items-center gap-1 pb-2">
+                        /* Mascot illustration with eyes ready for interactivity */
+                        <div className="flex flex-col items-center gap-2 pb-2">
                             <div
                                 className={cn(
-                                    "flex h-16 w-16 items-center justify-center rounded-2xl border-2 transition-all duration-300",
+                                    "relative flex h-40 w-40 items-center justify-center overflow-hidden rounded-3xl border-2 transition-all duration-300",
                                     focused
-                                        ? "border-primary bg-primary/10 shadow-lg shadow-primary/5"
-                                        : "border-border bg-muted/50",
+                                        ? "border-primary/30 shadow-lg shadow-primary/10"
+                                        : "border-muted/40 shadow-sm",
                                 )}
                             >
-                                <Lock
+                                {/* Mascot Image Container - eyes positioned for future tracking */}
+                                <img
+                                    src={mascotImage}
+                                    alt="Mascot"
+                                    className="h-full w-full object-cover transition-transform duration-300"
+                                    loading="lazy"
+                                />
+                                {/* Eye tracking overlay container (reserved for interactive elements) */}
+                                <div
                                     className={cn(
-                                        "h-7 w-7 transition-all duration-300",
-                                        focused
-                                            ? "text-primary"
-                                            : "text-muted-foreground",
-                                        visible && focused && "rotate-12",
+                                        "absolute inset-0 pointer-events-none transition-opacity duration-300",
+                                        focused ? "opacity-0" : "opacity-0",
                                     )}
+                                    data-eyes-container="true"
                                 />
                             </div>
                             {/* little tab that connects to the card */}
                             <div
                                 className={cn(
-                                    "h-2 w-10 rounded-t-md transition-colors duration-300",
-                                    focused ? "bg-primary/10" : "bg-muted/50",
+                                    "h-2 w-16 rounded-t-md transition-colors duration-300",
+                                    focused ? "bg-primary/15" : "bg-muted/50",
                                 )}
                             />
                         </div>
