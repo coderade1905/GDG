@@ -12,6 +12,13 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: true 
+    allowedHosts: true,
+    proxy: {
+      '/api/telebirr': {
+        target: 'https://transactioninfo.ethiotelecom.et',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/telebirr/, ''),
+      }
+    }
   }
 })
