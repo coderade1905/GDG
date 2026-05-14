@@ -4,6 +4,7 @@ import {KewtiMap} from "../kewti-maps/component";
 import TransactionValidator from "../kewti-banks/component";
 import {KewtiLocationSelector} from "../kewti-inputs/location_selector";
 import {KewtiPassword} from "../kewti-passwords/component";
+import {EthiopianDatePicker} from "../kewti-calender/DateInput";
 
 export default function KewtiDemo() {
     return (
@@ -17,6 +18,7 @@ export default function KewtiDemo() {
                 <EthiopianCalendar />
                 <KewtiLocationSelector />
                 <KewtiPassword />
+                <EthiopianDatePicker />
             </div>
         </div>
     );
