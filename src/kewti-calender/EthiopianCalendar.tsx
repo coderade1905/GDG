@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { useEthiopianCalendar } from './useEthiopianCalendar'
-import { getEthiopianMonthStartDay } from './utils'
+import { getEthiopianMonthStartDay, toGregorianDate, toEthiopianDate } from './utils'
 
 type CalendarMode = 'ethiopian' | 'gregorian'
 
@@ -15,9 +15,6 @@ const GC_MONTHS = [
 ]
 
 const DAYS_OF_WEEK_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-// Amharic days of the week, Sunday first
-// Docs on why order matters: the Ethiopian week also starts on Sunday
 const DAYS_OF_WEEK_AM = ['እሑድ', 'ሰኞ', 'ማክሰኞ', 'ረቡዕ', 'ሐሙስ', 'ዓርብ', 'ቅዳሜ']
 
 export function EthiopianCalendar({ onDateSelect }: EthiopianCalendarProps) {
@@ -48,9 +45,6 @@ export function EthiopianCalendar({ onDateSelect }: EthiopianCalendarProps) {
   }
 
   const etDays = Array.from({ length: daysInCurrentMonth }, (_, i) => i + 1)
-
-  // Get the weekday offset for the 1st of the current Ethiopian month
-  // So the grid aligns correctly under the day headers, just like Gregorian
   const etMonthStartDay = getEthiopianMonthStartDay(currentMonth, currentYear)
 
   const daysInGcMonth = new Date(gcYear, gcMonth + 1, 0).getDate()
@@ -66,6 +60,17 @@ export function EthiopianCalendar({ onDateSelect }: EthiopianCalendarProps) {
     if (gcMonth === 11) { setGcMonth(0); setGcYear(y => y + 1) }
     else setGcMonth(m => m + 1)
   }
+
+  // When a day is selected on the Ethiopian side, convert it to Gregorian
+  // toGregorianDate returns a JS Date object — we then format it for display
+  const etSelectedAsGC = selectedDay
+    ? toGregorianDate(selectedDay, currentMonth, currentYear)
+    : null
+
+  // When a day is selected on the Gregorian side, convert it to Ethiopian
+  const gcSelectedAsET = selectedDay
+    ? toEthiopianDate(new Date(gcYear, gcMonth, selectedDay))
+    : null
 
   return (
     <div className="w-fit rounded-xl border bg-background p-4 shadow-sm">
@@ -90,14 +95,14 @@ export function EthiopianCalendar({ onDateSelect }: EthiopianCalendarProps) {
 
       {mode === 'ethiopian' ? (
         <>
-          {/* Selected day detail panel */}
-          {selectedDay ? (
+          {/* Detail panel — shows ET date and its Gregorian equivalent below */}
+          {selectedDay && etSelectedAsGC ? (
             <div className="animate-in fade-in slide-in-from-top-2 duration-300 mb-4 rounded-md border border-border bg-muted/40 px-3 py-2">
               <p className="text-xs font-semibold text-foreground">
-                {monthAmharic} {selectedDay} · {currentYear}
+                {monthAmharic} {selectedDay} · {currentYear} ET
               </p>
-              <p className="text-[10px] text-muted-foreground">
-                {monthName} {selectedDay}, {currentYear} ET
+              <p className="text-[10px] text-muted-foreground mt-1">
+                = {GC_MONTHS[etSelectedAsGC.getMonth()]} {etSelectedAsGC.getDate()}, {etSelectedAsGC.getFullYear()} GC
               </p>
             </div>
           ) : (
@@ -126,7 +131,7 @@ export function EthiopianCalendar({ onDateSelect }: EthiopianCalendarProps) {
             </button>
           </div>
 
-          {/* Amharic day of week headers — 7 columns now, same as Gregorian */}
+          {/* Amharic day of week headers */}
           <div className="grid grid-cols-7 gap-1 mb-1">
             {DAYS_OF_WEEK_AM.map((d) => (
               <p key={d} className="text-center text-[10px] font-medium text-muted-foreground">
@@ -135,13 +140,11 @@ export function EthiopianCalendar({ onDateSelect }: EthiopianCalendarProps) {
             ))}
           </div>
 
-          {/* Ethiopian grid — now 7 columns with weekday offset */}
+          {/* Ethiopian grid */}
           <div className="grid grid-cols-7 gap-1">
-            {/* Empty cells to offset the 1st to the correct weekday column */}
             {Array.from({ length: etMonthStartDay }).map((_, i) => (
               <div key={`empty-${i}`} />
             ))}
-
             {etDays.map((day) => {
               const isToday = day === todayET.day && currentMonth === todayET.month && currentYear === todayET.year
               const isSelected = day === selectedDay
@@ -177,14 +180,14 @@ export function EthiopianCalendar({ onDateSelect }: EthiopianCalendarProps) {
         </>
       ) : (
         <>
-          {/* Selected day detail panel */}
-          {selectedDay ? (
+          {/* Detail panel — shows GC date and its Ethiopian equivalent below */}
+          {selectedDay && gcSelectedAsET ? (
             <div className="animate-in fade-in slide-in-from-top-2 duration-300 mb-4 rounded-md border border-border bg-muted/40 px-3 py-2">
               <p className="text-xs font-semibold text-foreground">
-                {GC_MONTHS[gcMonth]} {selectedDay} · {gcYear}
+                {GC_MONTHS[gcMonth]} {selectedDay} · {gcYear} GC
               </p>
-              <p className="text-[10px] text-muted-foreground">
-                Gregorian Calendar
+              <p className="text-[10px] text-muted-foreground mt-1">
+                = {gcSelectedAsET.month}/{gcSelectedAsET.day}/{gcSelectedAsET.year} ET
               </p>
             </div>
           ) : (
