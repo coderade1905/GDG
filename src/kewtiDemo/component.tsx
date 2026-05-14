@@ -2,7 +2,7 @@ import { EthiopianCalendar } from "../kewti-calender/EthiopianCalendar";
 import {KewtiInput} from "../kewti-inputs/component";
 import {KewtiMap} from "../kewti-maps/component";
 import TransactionValidator from "../kewti-banks/component";
-
+import {KewtiLocationSelector} from "../kewti-inputs/location_selector";
 export default function KewtiDemo() {
     return (
         <div className="h-full w-full flex items-center justify-center">
@@ -13,6 +13,7 @@ export default function KewtiDemo() {
                 <TransactionValidator />
                 <h1>Gregorian - Habeshan Calendar Component</h1>
                 <EthiopianCalendar />
+                <KewtiLocationSelector />
             </div>
         </div>
     );
