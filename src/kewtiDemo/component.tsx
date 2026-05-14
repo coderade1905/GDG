@@ -1,3 +1,4 @@
+import { EthiopianCalendar } from "../kewti-calender/EthiopianCalendar";
 import {KewtiInput} from "../kewti-inputs/component";
 import {KewtiMap} from "../kewti-maps/component";
 import TransactionValidator from "../kewti-banks/component";
@@ -10,6 +11,8 @@ export default function KewtiDemo() {
                 <KewtiInput variant="input" />
                 <KewtiMap />
                 <TransactionValidator />
+                <h1>Gregorian - Habeshan Calendar Component</h1>
+                <EthiopianCalendar />
             </div>
         </div>
     );
