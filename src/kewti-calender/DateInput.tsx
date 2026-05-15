@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover"
 import { EthiopianCalendar } from "./EthiopianCalendar"
 
-export function EthiopianDatePicker({setUserDate}: {setUserDate: (date: Date) => void}) {
+export function EthiopianDatePicker({setUserDate, className, style }: {setUserDate: (date: Date) => void, className?: string, style?: React.CSSProperties}) {
   const [date, setDate] = React.useState<Date>()
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -24,6 +24,8 @@ export function EthiopianDatePicker({setUserDate}: {setUserDate: (date: Date) =>
           variant="outline"
           className={cn(
             "w-[280px] justify-start text-left font-normal",
+            className,
+            style,
             !date && "text-muted-foreground"
           )}
         >
