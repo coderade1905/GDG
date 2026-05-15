@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/popover"
 import { EthiopianCalendar } from "./EthiopianCalendar"
 
-export function EthiopianDatePicker() {
-  // This state holds ONLY the standard Gregorian Date object
+export function EthiopianDatePicker({setUserDate}: {setUserDate: (date: Date) => void}) {
   const [date, setDate] = React.useState<Date>()
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -36,8 +35,10 @@ export function EthiopianDatePicker() {
         <EthiopianCalendar
           value={date}
           onDateSelect={(newDate) => {
+            if (!newDate) return
             setDate(newDate)
-            if (newDate) setIsOpen(false) // Auto-close when a day is picked
+            setUserDate(newDate)
+            setIsOpen(false) 
           }}
         />
       </PopoverContent>

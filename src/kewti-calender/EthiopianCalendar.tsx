@@ -61,6 +61,10 @@ const GC_MONTHS = [
   'November',
   'December'
 ]
+const ET_YEAR_RANGE = Array.from(
+  { length: 151 },
+  (_, i) => 1900 + i
+)
 
 const DAYS_OF_WEEK_EN = [
   'Sun',
@@ -125,7 +129,8 @@ export function EthiopianCalendar({
     monthAmharic,
     goToPrevMonth,
     goToNextMonth,
-    goToToday
+    goToToday,
+    setCurrentYear
   } = useEthiopianCalendar()
 
   useEffect(() => {
@@ -277,16 +282,32 @@ export function EthiopianCalendar({
               ←
             </button>
 
-            <div className="text-center">
+            <div className="flex flex-col items-center gap-1">
               <p className="text-base font-bold text-foreground">
                 {monthAmharic}
               </p>
 
-              <p className="text-xs text-muted-foreground">
-                {monthName} · {currentYear}
-              </p>
-            </div>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {monthName}
+                </p>
 
+                <select
+                  value={currentYear}
+                  onChange={(e) =>
+                    setCurrentYear(Number(e.target.value))
+                  }
+                  className="rounded-md border bg-background px-2 py-1 text-xs outline-none"
+                >
+                  {ET_YEAR_RANGE.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
             <button
               onClick={goToNextMonth}
               className="rounded-lg p-1 text-muted-foreground hover:bg-muted transition-colors cursor-pointer"

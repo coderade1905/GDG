@@ -11,9 +11,13 @@ interface UseEthiopianCalendarReturn {
   daysInCurrentMonth: number
   monthName: string
   monthAmharic: string
+
   goToPrevMonth: () => void
   goToNextMonth: () => void
   goToToday: () => void
+
+  setCurrentMonth: React.Dispatch<React.SetStateAction<number>>
+  setCurrentYear: React.Dispatch<React.SetStateAction<number>>
 }
 
 export function useEthiopianCalendar(): UseEthiopianCalendarReturn {
@@ -67,5 +71,7 @@ export function useEthiopianCalendar(): UseEthiopianCalendarReturn {
     goToPrevMonth,
     goToNextMonth,
     goToToday,
+    setCurrentMonth,
+    setCurrentYear,
   }
 }
