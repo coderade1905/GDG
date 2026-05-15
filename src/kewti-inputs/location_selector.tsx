@@ -20,7 +20,7 @@ interface Row {
   admin3name: string;
 }
 
-export function KewtiLocationSelector() {
+export function KewtiLocationSelector({setAddress}: {setAddress?: React.Dispatch<React.SetStateAction<string[]>>}) {
   const [data, setData] = React.useState<Row[]>([]);
   const [open, setOpen] = React.useState({ region: false, zone: false, woreda: false });
   const [values, setValues] = React.useState({ region: "", zone: "", woreda: "" });
@@ -39,6 +39,13 @@ export function KewtiLocationSelector() {
       });
   }, []);
 
+  useEffect(() => {
+    if (setAddress) {
+      const address = [values.region, values.zone, values.woreda].filter(Boolean);
+      setAddress(address);
+    }
+  }, [values, setAddress]);
+  
   const regions = Array.from(new Set(data.map((i) => i.admin1_name))).sort();
   const zones = Array.from(new Set(data.filter((i) => i.admin1_name === values.region).map((i) => i.admin2_name))).sort();
   const woredas = Array.from(new Set(data.filter((i) => i.admin1_name === values.region && i.admin2_name === values.zone).map((i) => i.admin3name))).sort();

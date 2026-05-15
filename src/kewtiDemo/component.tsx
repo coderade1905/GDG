@@ -7,9 +7,12 @@ import {KewtiPassword} from "../kewti-passwords/component";
 import {EthiopianDatePicker} from "../kewti-calender/DateInput";
 import { useEffect, useState } from "react";
 
+
 export default function KewtiDemo() {
     const [userDate, setUserDate] = useState<Date | null>(null);
     const [userInput, setUserInput] = useState<string>("");
+    const [address, setAddress] = useState<string>("");
+
     useEffect(() => {
         if (userDate) {
             console.log("User selected date:", userDate);
@@ -20,6 +23,11 @@ export default function KewtiDemo() {
             console.log("User input:", userInput);
         }
     }, [userInput]);
+   useEffect(() => {
+        if (address) {
+            console.log("Selected address:", address.join(", "));
+        }
+    }, [address]);
     return (
         <div className="h-full w-full flex items-center justify-center">
             <div className="mt-30">
@@ -29,7 +37,7 @@ export default function KewtiDemo() {
                 <TransactionValidator />
                 <h1>Gregorian - Habeshan Calendar Component</h1>
                 <EthiopianCalendar />
-                <KewtiLocationSelector />
+                <KewtiLocationSelector setAddress={setAddress} />
                 <KewtiPassword />
                 <EthiopianDatePicker setUserDate={setUserDate} />
             </div>
