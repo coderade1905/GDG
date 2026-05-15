@@ -1,8 +1,8 @@
-import KewtiDemo from "./kewtiDemo/component"; 
+import KewtiDocumentation from "./kewti-documentation/component";
 
 export function App() {
   return (
-    <KewtiDemo />
+    <KewtiDocumentation />
   )
 }
 

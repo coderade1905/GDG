@@ -331,7 +331,14 @@ async function fetchFromPrimarySource(reference: string, baseUrl: string): Promi
         const response = await axios.get(url, { timeout: 30000 }); // 30 second timeout to be safe
         console.log(`Received response with status: ${response.status}`);
 
-        const extractedData = scrapeTelebirrReceipt(response.data);
+        const html = response.data?.html;
+
+        if (typeof html !== "string") {
+            console.log("Invalid HTML payload:", response.data);
+            return null;
+        }
+
+        const extractedData = scrapeTelebirrReceipt(html);
 
         console.log("Extracted data from HTML:", extractedData);
         console.log(`Successfully extracted Telebirr data for reference: ${reference}`, {
@@ -458,7 +465,7 @@ async function fetchFromProxySource(reference: string, proxyUrl: string): Promis
 }
 
 export async function verifyTelebirr(reference: string): Promise<TelebirrReceipt | null> {
-    const primaryUrl = "/api/telebirr/receipt/";
+    const primaryUrl = "http://localhost:3001/api/telebirr/receipt/";
 
 
     const envProxies = "" //import.meta.env.VITE_FALLBACK_PROXIES || "";
