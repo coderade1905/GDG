@@ -65,6 +65,8 @@ interface KewtiPasswordProps {
     className?: string
     /** Slot for a mascot or illustration above the input */
     mascot?: React.ReactNode
+    setUserPassword?: React.Dispatch<React.SetStateAction<string>>,
+    style?: React.CSSProperties
 }
 
 export function KewtiPassword({
@@ -75,6 +77,8 @@ export function KewtiPassword({
     label = "Password",
     className,
     mascot,
+    setUserPassword,
+    style
 }: KewtiPasswordProps) {
     const [internalValue, setInternalValue] = React.useState("")
     const [visible, setVisible] = React.useState(false)
@@ -87,37 +91,131 @@ export function KewtiPassword({
     const config = STRENGTH_CONFIG[strength]
 
     // Eye tracking effect
+    const inputRef = React.useRef<HTMLInputElement>(null)
+
+    const mouseTarget = React.useRef({ x: 0, y: 0 })
+    const currentEye = React.useRef({ x: 0, y: 0 })
+
+
+    React.useEffect(() => {
+        let animationFrame: number
+
+        const animate = () => {
+            currentEye.current.x +=
+                (mouseTarget.current.x - currentEye.current.x) * 0.12
+
+            currentEye.current.y +=
+                (mouseTarget.current.y - currentEye.current.y) * 0.12
+
+            setEyePosition({
+                x: currentEye.current.x,
+                y: currentEye.current.y,
+            })
+
+            animationFrame = requestAnimationFrame(animate)
+        }
+
+        animate()
+
+        return () => cancelAnimationFrame(animationFrame)
+    }, [])
+
     React.useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
-            if (!mascotRef.current) return
+            if (!mascotRef.current || focused) return
 
             const rect = mascotRef.current.getBoundingClientRect()
+
             const centerX = rect.left + rect.width / 2
             const centerY = rect.top + rect.height / 2
 
-            // Calculate angle to cursor
-            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX)
-            const maxHorizontal = 6 // Max horizontal distance
-            const maxVertical = 3 // Max vertical distance
+            const dx = e.clientX - centerX
+            const dy = e.clientY - centerY
 
-            setEyePosition({
-                x: Math.cos(angle) * maxHorizontal,
-                y: Math.sin(angle) * maxVertical,
-            })
+            mouseTarget.current = {
+                x: Math.max(-6, Math.min(6, dx * 0.02)),
+                y: Math.max(-3, Math.min(3, dy * 0.02)),
+            }
         }
 
         window.addEventListener("mousemove", handleMouseMove)
-        return () => window.removeEventListener("mousemove", handleMouseMove)
-    }, [])
+
+        return () => {
+            window.removeEventListener("mousemove", handleMouseMove)
+        }
+    }, [focused])
+
+    const updateEyesFromCaret = () => {
+        const input = inputRef.current
+
+        if (!input || !mascotRef.current) return
+
+        const caret = input.selectionStart || 0
+
+        // create hidden mirror
+        const div = document.createElement("div")
+        const span = document.createElement("span")
+
+        const style = window.getComputedStyle(input)
+
+            ;[
+                "fontSize",
+                "fontFamily",
+                "fontWeight",
+                "letterSpacing",
+                "padding",
+                "border",
+                "width",
+                "lineHeight",
+            ].forEach((prop) => {
+                // @ts-ignore
+                div.style[prop] = style[prop]
+            })
+
+        div.style.position = "absolute"
+        div.style.visibility = "hidden"
+        div.style.whiteSpace = "pre"
+
+        div.textContent = input.value.substring(0, caret)
+
+        span.textContent = "|"
+
+        div.appendChild(span)
+
+        document.body.appendChild(div)
+
+        const caretX = span.offsetLeft
+
+        document.body.removeChild(div)
+
+        const inputWidth = input.clientWidth
+
+        const normalized = (caretX / inputWidth - 0.5) 
+
+        mouseTarget.current = {
+            x: Math.max(-6, Math.min(6, normalized * 8)),
+            y: 1,
+        }
+    }
+
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const next = e.target.value
-        if (controlledValue === undefined) setInternalValue(next)
-        onChange?.(next)
-    }
 
+        if (controlledValue === undefined) {
+            setInternalValue(next)
+        }
+
+        onChange?.(next)
+
+        requestAnimationFrame(updateEyesFromCaret)
+        if (setUserPassword) {
+            setUserPassword(next)
+        }
+    }
     return (
-        <div className={cn("mx-auto w-full max-w-sm", className)}>
+        <div className={cn("mx-auto w-full max-w-sm", className)} style={style}>
             {/* ── Mascot Zone ───────────────────────── */}
             <div className="flex items-end justify-center">
                 <div
@@ -235,6 +333,7 @@ export function KewtiPassword({
                         id="kewti-password-input"
                         type={visible ? "text" : "password"}
                         value={password}
+                        ref={inputRef}
                         onChange={handleChange}
                         onFocus={() => setFocused(true)}
                         onBlur={() => setFocused(false)}

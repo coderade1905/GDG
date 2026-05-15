@@ -11,7 +11,8 @@ import { useEffect, useState } from "react";
 export default function KewtiDemo() {
     const [userDate, setUserDate] = useState<Date | null>(null);
     const [userInput, setUserInput] = useState<string>("");
-    const [address, setAddress] = useState<string>("");
+    const [address, setAddress] = useState<string[]>([]);
+    const [userPassword, setUserPassword] = useState<string>("");
 
     useEffect(() => {
         if (userDate) {
@@ -23,8 +24,12 @@ export default function KewtiDemo() {
             console.log("User input:", userInput);
         }
     }, [userInput]);
-   useEffect(() => {
-        if (address) {
+    useEffect(() => {        if (userPassword) {
+            console.log("User password:", userPassword);
+        }   
+    }, [userPassword]);
+    useEffect(() => {
+        if (address.length > 0) {
             console.log("Selected address:", address.join(", "));
         }
     }, [address]);
@@ -38,7 +43,7 @@ export default function KewtiDemo() {
                 <h1>Gregorian - Habeshan Calendar Component</h1>
                 <EthiopianCalendar />
                 <KewtiLocationSelector setAddress={setAddress} />
-                <KewtiPassword />
+                <KewtiPassword setUserPassword={setUserPassword} />
                 <EthiopianDatePicker setUserDate={setUserDate} />
             </div>
         </div>
