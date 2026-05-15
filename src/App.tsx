@@ -1,9 +1,11 @@
-import KewtiDemo from "./kewtiDemo/component"; 
+import KewtiPage from './kewtiPage/kewtiPage';
 
 export function App() {
   return (
-    <KewtiDemo />
-  )
+    <>
+      <KewtiPage />
+    </>
+  );
 }
 
-export default App
+export default App;

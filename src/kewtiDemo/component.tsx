@@ -34,17 +34,60 @@ export default function KewtiDemo() {
         }
     }, [address]);
     return (
-        <div className="h-full w-full flex items-center justify-center">
-            <div className="mt-30">
-                <h1>A simple page for testing components</h1>
-                <KewtiInput variant="input" setUserInput={setUserInput} />
-                <KewtiMap />
-                <TransactionValidator />
-                <h1>Gregorian - Habeshan Calendar Component</h1>
-                <EthiopianCalendar />
-                <KewtiLocationSelector setAddress={setAddress} />
-                <KewtiPassword setUserPassword={setUserPassword} />
-                <EthiopianDatePicker setUserDate={setUserDate} />
+        <div className="w-full flex items-start p-7 gap-6">
+            <div className="w-full max-w-3xl flex flex-col items-center space-y-8 py-8">
+                <h1 className="text-2xl font-bold">A simple page for testing components</h1>
+
+                <section className="w-full flex flex-col items-center gap-6">
+                    <div className="relative w-full flex justify-center">
+                        <div className="w-full sm:w-3/4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 flex flex-col items-center">
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-white dark:bg-zinc-900 px-3 text-sm font-medium">Kewti Input</div>
+                            <div className="w-full flex justify-center"><KewtiInput variant="input" setUserInput={setUserInput} /></div>
+                        </div>
+                    </div>
+
+                    <div className="relative w-full flex justify-center">
+                        <div className="w-full sm:w-3/4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 flex flex-col items-center">
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-white dark:bg-zinc-900 px-3 text-sm font-medium">Kewti Map</div>
+                            <div className="w-full flex justify-center"><KewtiMap /></div>
+                        </div>
+                    </div>
+
+                    <div className="relative w-full flex justify-center">
+                        <div className="w-full sm:w-3/4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 flex flex-col items-center">
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-white dark:bg-zinc-900 px-3 text-sm font-medium">Transaction Validator</div>
+                            <div className="w-full flex justify-center"><TransactionValidator /></div>
+                        </div>
+                    </div>
+
+                    <div className="relative w-full flex justify-center">
+                        <div className="w-full sm:w-3/4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 flex flex-col items-center">
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-white dark:bg-zinc-900 px-3 text-sm font-medium">Gregorian - Habeshan Calendar</div>
+                            <div className="w-full flex justify-center"><EthiopianCalendar /></div>
+                        </div>
+                    </div>
+
+                    <div className="relative w-full flex justify-center">
+                        <div className="w-full sm:w-3/4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 flex flex-col items-center">
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-white dark:bg-zinc-900 px-3 text-sm font-medium">Location Selector</div>
+                            <div className="w-full flex justify-center"><KewtiLocationSelector setAddress={setAddress} /></div>
+                        </div>
+                    </div>
+
+                    <div className="relative w-full flex justify-center">
+                        <div className="w-full sm:w-3/4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 flex flex-col items-center">
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-white dark:bg-zinc-900 px-3 text-sm font-medium">Kewti Password</div>
+                            <div className="w-full flex justify-center"><KewtiPassword setUserPassword={setUserPassword} /></div>
+                        </div>
+                    </div>
+
+                    <div className="relative w-full flex justify-center">
+                        <div className="w-full sm:w-3/4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 flex flex-col items-center">
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-white dark:bg-zinc-900 px-3 text-sm font-medium">Ethiopian Date Picker</div>
+                            <div className="w-full flex justify-center"><EthiopianDatePicker setUserDate={setUserDate} /></div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     );
