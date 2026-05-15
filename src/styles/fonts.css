@@ -1,0 +1,20 @@
+@font-face {
+  font-family: "kewti";
+  src: url("/fonts/Abinet_3038426dc8.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "bela_hidase";
+  src: url("/fonts/Bela_Hidase_Extra_Bold_9020959aee.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "geez_digital";
+  src: url("/fonts/Geez_Digital_V1_5be0497d4c.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
