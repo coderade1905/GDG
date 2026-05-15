@@ -89,7 +89,7 @@ export function KewtiLocationSelector({
   ).sort();
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-6 w-full">
+    <div className="grid  grid-cols-1 gap-2 items-center">
       <Combobox
         open={open.region}
         setOpen={(val: any) =>
@@ -154,17 +154,19 @@ function Combobox({
           variant="outline"
           role="combobox"
           disabled={disabled}
-          className="w-full sm:w-[250px] justify-between"
+          className="w-full justify-between overflow-hidden min-w-0"
         >
-          <span className="truncate">
+
+          <span className="truncate block flex-1 text-left min-w-0 pr-2">
             {value || placeholder}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
 
+
       <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] sm:w-[250px] p-0"
+        className="w-[var(--radix-popover-trigger-width)] p-0"
       >
         <Command>
           <CommandInput placeholder="Search..." />
@@ -182,13 +184,13 @@ function Combobox({
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-2 h-4 w-4 shrink-0",
                       value === opt
                         ? "opacity-100"
                         : "opacity-0"
                     )}
                   />
-                  {opt}
+                  <span className="truncate">{opt}</span>
                 </CommandItem>
               ))}
             </CommandGroup>
