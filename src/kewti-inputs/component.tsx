@@ -31,6 +31,9 @@ interface ChatInputProps extends VariantProps<typeof chatInputVariants> {
     onSend?: (value: string) => void
     className?: string
     containerClassName?: string
+    style?: React.CSSProperties
+    containerStyle?: React.CSSProperties
+    setUserInput?: React.Dispatch<React.SetStateAction<string>>
     inputClassName?: string
     defaultLanguage?: "am" | "en" // Added prop
 }
@@ -51,6 +54,9 @@ export function KewtiInput({
     containerClassName,
     inputClassName,
     defaultLanguage = "am", // Defaults to Amharic
+    style,
+    containerStyle,
+    setUserInput
 }: ChatInputProps) {
     const [value, setValue] = React.useState("")
     const [options, setOptions] = React.useState<string[]>([])
@@ -100,6 +106,7 @@ export function KewtiInput({
             }
 
             setValue(text)
+            setUserInput?.(text)
         }
 
         recognitionRef.current = recognition
@@ -162,6 +169,7 @@ export function KewtiInput({
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         const newValue = e.target.value
         setValue(newValue)
+        setUserInput?.(newValue)
 
         // Only transliterate if language is Amharic
         if (language !== "am") {
@@ -237,8 +245,8 @@ export function KewtiInput({
     )
 
     return (
-        <div className={cn("w-full p-4", containerClassName)}>
-            <div className={cn(chatInputVariants({ size }), className)}>
+        <div className={cn("w-full p-4", containerClassName)} style={containerStyle}>
+            <div className={cn(chatInputVariants({ size }), className)} style={style}>
 
                 {options.length > 0 && language === "am" && (
                     <div className="absolute -top-12 left-4 z-20 flex items-center gap-1 rounded-xl border bg-popover px-2 py-1.5 shadow-lg animate-in fade-in slide-in-from-bottom-2">
