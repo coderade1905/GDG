@@ -11,6 +11,7 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/kewti.es.js",
       "require": "./dist/kewti.umd.js"
+    }
     },
     "./style.css": "./dist/kewti_components.css"
   },
