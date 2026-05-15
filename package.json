@@ -20,6 +20,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "build:site": "vite build --config vite.config.site.js",
     "typecheck": "tsc --noEmit",
     "publish-pkg": "npm run build && npm version patch && npm publish"
   },
