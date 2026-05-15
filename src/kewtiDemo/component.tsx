@@ -2,7 +2,7 @@ import { EthiopianCalendar } from "../kewti-calender/EthiopianCalendar";
 import {KewtiInput} from "../kewti-inputs/component";
 import {KewtiMap} from "../kewti-maps/component";
 import TransactionValidator from "../kewti-banks/component";
-import {KewtiLocationSelector} from "../kewti-inputs/location_selector";
+import {KewtiLocationSelector} from "../kewti-regions/component";
 import {KewtiPassword} from "../kewti-passwords/component";
 import {EthiopianDatePicker} from "../kewti-calender/DateInput";
 import { useEffect, useState } from "react";

@@ -64,9 +64,6 @@ export function KewtiInput({
     const [language, setLanguage] = React.useState<"am" | "en">(defaultLanguage)
     const [supported, setSupported] = useState(true)
     const [listening, setListening] = useState(false)
-    const [transcript, setTranscript] = useState("")
-    const [finalTranscript, setFinalTranscript] = useState("")
-    const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
 
     const recognitionRef = useRef<any>(null)
 
@@ -111,14 +108,6 @@ export function KewtiInput({
 
         recognitionRef.current = recognition
 
-        // Load TTS voices
-        const loadVoices = () => {
-            const allVoices = speechSynthesis.getVoices()
-            setVoices(allVoices)
-        }
-
-        loadVoices()
-        speechSynthesis.onvoiceschanged = loadVoices
     }, [])
 
     const startListening = () => {

@@ -1,15 +1,30 @@
 {
-  "name": "Kewti",
-  "private": true,
-  "version": "0.0.1",
+  "name": "kewti_components",
+  "private": false,
+  "version": "0.0.2",
   "type": "module",
+  "main": "./dist/kewti.umd.js",
+  "module": "./dist/kewti.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/kewti.es.js",
+      "require": "./dist/kewti.umd.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "build": "vite build",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "publish-pkg": "npm run build && npm version patch && npm publish"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",
@@ -26,8 +41,6 @@
     "lucide-react": "^1.16.0",
     "papaparse": "^5.5.3",
     "radix-ui": "^1.4.3",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
     "react-webcam": "^7.2.0",
     "shadcn": "^4.7.0",
     "tailwind-merge": "^3.6.0",
@@ -48,8 +61,11 @@
     "globals": "^16.5.0",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.57.1",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^5.0.0"
   }
 }
