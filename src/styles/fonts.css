@@ -1,5 +1,5 @@
 @font-face {
-  font-family: "kewti";
+  font-family: "abinet";
   src: url("/fonts/Abinet_3038426dc8.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
@@ -18,3 +18,32 @@
   font-weight: 400;
   font-style: normal;
 }
+
+@font-face {
+  font-family: "menbere";
+  src: url("/fonts/Menbere_Variable_Font_wght_2c787a3cf0.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "mesob";
+  src: url("/fonts/Mesob_Regular_O_7eb0a6d47f.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "benaiah";
+  src: url("/fonts/Benaiah_536454528f.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "zemach";
+  src: url("/fonts/Zemach_Regular_eafc59f80a.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+

@@ -161,6 +161,7 @@ export default function KewtiPage({ onNavigate }: { onNavigate?: (route: string)
             <ComponentPlaceholder name="KewtiLocationSelector" description="Cascading dropdowns for selecting regions, zones, woredas, and sub-cities." />
             <ComponentPlaceholder name="KewtiPassword" description="Secure password input field." />
             <ComponentPlaceholder name="KewtiMap" description="Interactive mapping integration for picking location coordinates." />
+            <ComponentPlaceholder name="KewtiFonts" description="Custom Ethiopian font application component." />
           </div>
 
           <div className="mt-20 pt-8 border-t border-zinc-200 dark:border-zinc-800 text-sm text-zinc-500">

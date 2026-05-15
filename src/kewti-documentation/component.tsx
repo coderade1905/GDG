@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Terminal, Map as MapIcon, Calendar, Lock, CheckCircle, Package, Code, Copy, ChevronLeft, Menu, X } from "lucide-react";
+import { Terminal, Map as MapIcon, Calendar, Lock, CheckCircle, Package, Code, Copy, ChevronLeft, Menu, X, Type } from "lucide-react";
 import { KewtiInput } from "../kewti-inputs/component";
 import { KewtiMap } from "../kewti-maps/component";
 import TransactionValidator from "../kewti-banks/component";
@@ -7,6 +7,7 @@ import { EthiopianCalendar } from "../kewti-calender/EthiopianCalendar";
 import { KewtiLocationSelector } from "../kewti-regions/component.tsx";
 import { KewtiPassword } from "../kewti-passwords/component";
 import { EthiopianDatePicker } from "../kewti-calender/DateInput";
+import { KewtiFonts } from "../kewti-fonts/component";
 
 const SECTIONS = [
   { id: "installation", title: "Installation", icon: Terminal },
@@ -17,6 +18,7 @@ const SECTIONS = [
   { id: "kewti-location", title: "Location Selector", icon: Package },
   { id: "kewti-password", title: "Password Input", icon: Lock },
   { id: "ethiopian-date", title: "Ethiopian Date Picker", icon: Calendar },
+  { id: "kewti-fonts", title: "Kewti Fonts", icon: Type },
 ];
 
 const CodeBlock = ({ code }: { code: string }) => {
@@ -275,6 +277,39 @@ const [date, setDate] = useState(null);
           </div>
         );
 
+      case "kewti-fonts":
+        return (
+          <div className="animate-in fade-in duration-500 w-full">
+            <SectionHeader
+              title="Kewti Fonts"
+              description="A component for applying custom Ethiopian fonts easily."
+            />
+            <CodeBlock
+              code={`import { KewtiFonts } from "kewti_components";
+
+<KewtiFonts font="menbere">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiFonts>
+<KewtiFonts font="mesob">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiFonts>
+<KewtiFonts font="geez_digital">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiFonts>`}
+            />
+            <ComponentPreview>
+              <div className="w-full max-w-lg flex flex-col gap-6">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">menbere</p>
+                  <KewtiFonts font="menbere" className="text-2xl md:text-3xl">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiFonts>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">abinet</p>
+                  <KewtiFonts font="abinet" className="text-2xl md:text-3xl">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiFonts>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">geez_digital</p>
+                  <KewtiFonts font="geez_digital" className="text-2xl md:text-3xl">ቀስ በ ቀስ እንቁላል በግሩ ይሄዳል</KewtiFonts>
+                </div>
+              </div>
+            </ComponentPreview>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -289,8 +324,8 @@ const [date, setDate] = useState(null);
           </div>
           <span className="font-semibold text-sm">Kewti Docs</span>
         </div>
-        <button 
-          onClick={() => setIsMenuOpen(!isMenuOpen)} 
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -298,16 +333,15 @@ const [date, setDate] = useState(null);
       </div>
 
       {isMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsMenuOpen(false)}
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-background/95 backdrop-blur-md border-r border-border transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:bg-muted/30 md:h-screen md:sticky md:top-0 overflow-y-auto ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-background/95 backdrop-blur-md border-r border-border transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:bg-muted/30 md:h-screen md:sticky md:top-0 overflow-y-auto ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="p-4 md:p-6 min-h-full flex flex-col">
           <div className="mb-6 md:mb-8 flex flex-col gap-4">
@@ -336,11 +370,10 @@ const [date, setDate] = useState(null);
             </div>
             <button
               onClick={() => handleNavClick("installation")}
-              className={`w-full flex items-center px-2 md:px-3 py-2 text-sm rounded-md transition-colors ${
-                activeSection === "installation"
-                  ? "bg-accent text-accent-foreground font-medium"
-                  : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-              }`}
+              className={`w-full flex items-center px-2 md:px-3 py-2 text-sm rounded-md transition-colors ${activeSection === "installation"
+                ? "bg-accent text-accent-foreground font-medium"
+                : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                }`}
             >
               <Terminal className="w-4 h-4 mr-3 shrink-0" />
               <span className="truncate">Installation</span>
@@ -357,11 +390,10 @@ const [date, setDate] = useState(null);
                 <button
                   key={section.id}
                   onClick={() => handleNavClick(section.id)}
-                  className={`w-full flex items-center px-2 md:px-3 py-2 text-sm rounded-md transition-colors ${
-                    isActive
-                      ? "bg-accent text-accent-foreground font-medium"
-                      : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                  }`}
+                  className={`w-full flex items-center px-2 md:px-3 py-2 text-sm rounded-md transition-colors ${isActive
+                    ? "bg-accent text-accent-foreground font-medium"
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                    }`}
                 >
                   <Icon className="w-4 h-4 mr-3 shrink-0" />
                   <span className="truncate">{section.title}</span>
