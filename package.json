@@ -1,7 +1,7 @@
 {
   "name": "kewti_components",
   "private": false,
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "main": "./dist/kewti.umd.js",
   "module": "./dist/kewti.es.js",
@@ -12,7 +12,7 @@
       "import": "./dist/kewti.es.js",
       "require": "./dist/kewti.umd.js"
     },
-    "./style.css": "./dist/kewti_components.css" 
+    "./style.css": "./dist/kewti_components.css"
   },
   "files": [
     "dist"
