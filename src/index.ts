@@ -1,3 +1,5 @@
+import "./index.css"; 
+
 export { EthiopianCalendar } from "./kewti-calender/EthiopianCalendar";
 export { EthiopianDatePicker } from "./kewti-calender/DateInput";
 
