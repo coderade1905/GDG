@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Terminal, Map as MapIcon, Calendar, Lock, CheckCircle, Package, Menu, X, Code, ChevronRight, Copy, Moon, Sun } from "lucide-react";
+import React, { useState } from "react";
+import { Terminal, Map as MapIcon, Calendar, Lock, CheckCircle, Package, Code, Copy, ChevronLeft } from "lucide-react";
 import { KewtiInput } from "../kewti-inputs/component";
 import { KewtiMap } from "../kewti-maps/component";
 import TransactionValidator from "../kewti-banks/component";
@@ -69,33 +69,13 @@ const ComponentPreview = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-export default function KewtiDocumentation() {
+export default function KewtiDocumentation({ onBack }: { onBack?: () => void }) {
   const [activeSection, setActiveSection] = useState("installation");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
 
   const [userInput, setUserInput] = useState("");
-  const [userPassword, setUserPassword] = useState("");
+  const [, setUserPassword] = useState("");
   const [address, setAddress] = useState<string[]>([]);
   const [userDate, setUserDate] = useState<Date | null>(null);
-
-  useEffect(() => {
-    // Check initial preference
-    if (document.documentElement.classList.contains("dark") ||
-      window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
-
-  const toggleDarkMode = () => {
-    setIsDark(!isDark);
-    if (!isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  };
 
   const renderContent = () => {
     switch (activeSection) {
@@ -297,50 +277,30 @@ const [date, setDate] = useState(null);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-muted">
-      {/* Mobile Header */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-background sticky top-0 z-50">
-        <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 flex items-center justify-center">
-            <Package className="w-5 h-5 text-foreground" />
-          </div>
-          <span className="font-semibold text-base tracking-tight">Kewti UI</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <button onClick={toggleDarkMode} className="p-2 text-muted-foreground hover:text-foreground">
-            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
-          <button onClick={() => setSidebarOpen(true)} className="p-2 text-muted-foreground hover:text-foreground">
-            <Menu className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         {/* Sidebar */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-64 bg-muted/30 border-r border-border transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:h-screen md:sticky top-0 overflow-y-auto ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
+          className="sticky top-0 z-40 w-full md:w-64 md:shrink-0 h-screen bg-muted/30 border-b md:border-b-0 md:border-r border-border overflow-hidden overscroll-none"
         >
           <div className="p-6">
-            <div className="hidden md:flex items-center justify-between mb-8">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 flex items-center justify-center bg-foreground text-background rounded">
-                  <Package className="w-4 h-4" />
+            <div className="mb-8 flex flex-col gap-4">
+              <button
+                type="button"
+                onClick={onBack}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Back
+              </button>
+              <div className="flex flex-col items-start gap-2">
+                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-foreground text-background shadow-sm">
+                  <Package className="w-5 h-5" />
                 </div>
-                <span className="font-bold text-lg tracking-tight text-foreground">
-                  Kewti UI
-                </span>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Kewti Documentation</p>
+                  <p className="text-xs text-muted-foreground">Component library</p>
+                </div>
               </div>
-              <button onClick={toggleDarkMode} className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-md hover:bg-muted">
-                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-            </div>
-
-            <div className="md:hidden flex justify-between items-center mb-8">
-              <span className="font-bold text-lg">Menu</span>
-              <button onClick={() => setSidebarOpen(false)} className="p-2 text-muted-foreground">
-                <X className="w-5 h-5" />
-              </button>
             </div>
 
             <nav className="space-y-1">
@@ -348,7 +308,7 @@ const [date, setDate] = useState(null);
                 Getting Started
               </div>
               <button
-                onClick={() => { setActiveSection("installation"); setSidebarOpen(false); }}
+                onClick={() => setActiveSection("installation")}
                 className={`w-full flex items-center px-3 py-2 text-sm rounded-md transition-colors ${activeSection === "installation"
                   ? "bg-accent text-accent-foreground font-medium"
                   : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
@@ -368,7 +328,7 @@ const [date, setDate] = useState(null);
                 return (
                   <button
                     key={section.id}
-                    onClick={() => { setActiveSection(section.id); setSidebarOpen(false); }}
+                    onClick={() => setActiveSection(section.id)}
                     className={`w-full flex items-center px-3 py-2 text-sm rounded-md transition-colors ${isActive
                       ? "bg-accent text-accent-foreground font-medium"
                       : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
@@ -383,21 +343,11 @@ const [date, setDate] = useState(null);
           </div>
         </aside >
 
-        {/* Overlay for mobile sidebar */}
-        {
-          sidebarOpen && (
-            <div
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
-              onClick={() => setSidebarOpen(false)}
-            ></div>
-          )
-        }
-
         {/* Main Content */}
         <main className="flex-1 max-w-4xl mx-auto px-6 md:px-12 py-10 md:py-16">
           {renderContent()}
         </main>
-      </div >
+      </div>
     </div >
   );
 }
