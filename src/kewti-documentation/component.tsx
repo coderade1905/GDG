@@ -7,7 +7,7 @@ import { EthiopianCalendar } from "../kewti-calender/EthiopianCalendar";
 import { KewtiLocationSelector } from "../kewti-regions/component.tsx";
 import { KewtiPassword } from "../kewti-passwords/component";
 import { EthiopianDatePicker } from "../kewti-calender/DateInput";
-import { KewtiFonts } from "../kewti-fonts/component";
+import { KewtiFonts, KewtiPronounce } from "../kewti-fonts/component";
 
 const SECTIONS = [
   { id: "installation", title: "Installation", icon: Terminal },
@@ -285,25 +285,37 @@ const [date, setDate] = useState(null);
               description="A component for applying custom Ethiopian fonts easily."
             />
             <CodeBlock
-              code={`import { KewtiFonts } from "kewti_components";
+              code={`import { KewtiFonts, KewtiPronounce } from "kewti_components";
 
-<KewtiFonts font="menbere">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiFonts>
-<KewtiFonts font="mesob">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiFonts>
-<KewtiFonts font="geez_digital">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiFonts>`}
+<KewtiFonts font="menbere">
+  <KewtiPronounce text="ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiPronounce>
+</KewtiFonts>
+<KewtiFonts font="abinet">
+  <KewtiPronounce text="ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiPronounce>
+</KewtiFonts>
+<KewtiFonts font="geez_digital">
+  <KewtiPronounce text="ቀስ በ ቀስ እንቁላል በግሩ ይሄዳል">ቀስ በ ቀስ እንቁላል በግሩ ይሄዳል</KewtiPronounce>
+</KewtiFonts>`}
             />
             <ComponentPreview>
               <div className="w-full max-w-lg flex flex-col gap-6">
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">menbere</p>
-                  <KewtiFonts font="menbere" className="text-2xl md:text-3xl">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiFonts>
+                  <KewtiFonts font="menbere" className="text-2xl md:text-3xl">
+                    <KewtiPronounce text="ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiPronounce>
+                  </KewtiFonts>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">abinet</p>
-                  <KewtiFonts font="abinet" className="text-2xl md:text-3xl">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiFonts>
+                  <KewtiFonts font="abinet" className="text-2xl md:text-3xl">
+                    <KewtiPronounce text="ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል">ቀስ በ ቀስ እንቁላል በእግሩ ይሄዳል</KewtiPronounce>
+                  </KewtiFonts>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">geez_digital</p>
-                  <KewtiFonts font="geez_digital" className="text-2xl md:text-3xl">ቀስ በ ቀስ እንቁላል በግሩ ይሄዳል</KewtiFonts>
+                  <KewtiFonts font="geez_digital" className="text-2xl md:text-3xl">
+                    <KewtiPronounce text="ቀስ በ ቀስ እንቁላል በግሩ ይሄዳል">ቀስ በ ቀስ እንቁላል በግሩ ይሄዳል</KewtiPronounce>
+                  </KewtiFonts>
                 </div>
               </div>
             </ComponentPreview>

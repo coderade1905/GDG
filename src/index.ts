@@ -11,3 +11,5 @@ export { KewtiMap } from "./kewti-maps/component";
 export { default as TransactionValidator } from "./kewti-banks/component";
 
 export { KewtiPassword } from "./kewti-passwords/component";
+
+export { KewtiFonts, KewtiPronounce } from "./kewti-fonts/component";
