@@ -2,7 +2,7 @@ import { Package, Moon, Sun, Copy, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import KewtiMascot from '../kewti-mascot/component.tsx';
 
-export default function KewtiPage() {
+export default function KewtiPage({ onNavigate }: { onNavigate?: (route: string) => void }) {
   const [isDark, setIsDark] = useState(true);
   const [copied, setCopied] = useState(false);
 
@@ -42,8 +42,8 @@ export default function KewtiPage() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen lg:h-screen lg:overflow-hidden font-sans bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50 transition-colors duration-200 selection:bg-zinc-900 selection:text-white dark:selection:bg-zinc-100 dark:selection:text-zinc-900">
-      <div className="lg:w-[45%] xl:w-[40%] p-6 lg:p-12 lg:h-screen border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-zinc-800 relative flex flex-col justify-between shrink-0 bg-white dark:bg-zinc-950 transition-colors duration-200">
+    <div className="flex flex-col lg:flex-row min-h-screen lg:h-screen lg:overflow-hidden font-sans bg-white dark:bg-black text-black dark:text-white transition-colors duration-200 selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
+      <div className="lg:w-[45%] xl:w-[40%] p-6 lg:p-12 lg:h-screen lg:sticky lg:top-0 border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-zinc-700 relative flex flex-col justify-between shrink-0 bg-white dark:bg-black transition-colors duration-200">
         <div className="z-10 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Package className="w-5 h-5 stroke-[2]" />
@@ -69,13 +69,26 @@ export default function KewtiPage() {
             <a
               href="#docs"
               onClick={(e) => smoothScrollTo(e, 'docs')}
-              className="inline-flex h-9 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-white shadow transition transform hover:scale-[1.02] hover:bg-emerald-700 dark:bg-emerald-500 dark:text-zinc-900 dark:hover:bg-emerald-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+              className="inline-flex h-9 items-center justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white shadow transition transform hover:scale-[1.02] hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-black"
             >
               Get Started
             </a>
             <a href="https://github.com/coderade1905/GDG" target="_blank" rel="noreferrer" className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-zinc-50">
               GitHub
             </a>
+              <button
+                onClick={(e) => {
+                  if (onNavigate) {
+                    e.preventDefault();
+                    onNavigate('docs');
+                  } else {
+                    smoothScrollTo(e, 'docs');
+                  }
+                }}
+                className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
+              >
+                Documentation
+              </button>
           </div>
         </div>
 
@@ -93,26 +106,8 @@ export default function KewtiPage() {
         </div>
       </div>
 
-      <div className="flex-1 lg:w-[55%] xl:w-[60%] overflow-y-auto relative flex flex-col lg:h-screen bg-zinc-50/50 dark:bg-zinc-950/50 transition-colors duration-200">
-        <nav className="sticky top-0 z-50 flex items-center px-6 lg:px-12 bg-zinc-50/80 dark:bg-zinc-950/80 backdrop-blur border-b border-zinc-200 dark:border-zinc-800 transition-colors duration-200 h-14">
-          <div className="flex items-center space-x-3 text-sm font-medium text-zinc-500 dark:text-zinc-400">
-            <button
-              onClick={(e) => smoothScrollTo(e, 'docs')}
-              className="inline-flex items-center px-3 py-1 rounded-md bg-white text-zinc-950 dark:bg-zinc-800 dark:text-zinc-50 border border-zinc-200 dark:border-zinc-700 shadow-sm hover:scale-[1.02] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
-              aria-label="Go to documentation"
-            >
-              Documentation
-            </button>
-
-            <button
-              onClick={(e) => smoothScrollTo(e, 'components')}
-              className="inline-flex items-center px-3 py-1 rounded-md bg-transparent text-zinc-700 dark:text-zinc-300 border border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
-              aria-label="Go to components"
-            >
-              Components
-            </button>
-          </div>
-        </nav>
+      <div className="flex-1 lg:w-[55%] xl:w-[60%] overflow-y-auto relative flex flex-col lg:h-screen bg-white/50 dark:bg-black/50 transition-colors duration-200">
+        {/* horizontal nav removed per request */}
 
         <div className="p-6 lg:p-12 xl:px-16 py-12 max-w-3xl w-full">
           <div id="docs" className="mb-12">
