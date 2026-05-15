@@ -156,12 +156,13 @@ export default function KewtiPage({ onNavigate }: { onNavigate?: (route: string)
 
           <div className="space-y-4">
             <ComponentPlaceholder name="KewtiInput" description="Input field variant with built-in styling and states." />
-            <ComponentPlaceholder name="EthiopianCalendar" description="Calendar implementation supporting Gregorian-to-Habeshan date conversions." />
-            <ComponentPlaceholder name="TransactionValidator" description="Payment parsing and validation flows for CBE and Telebirr." />
             <ComponentPlaceholder name="KewtiLocationSelector" description="Cascading dropdowns for selecting regions, zones, woredas, and sub-cities." />
             <ComponentPlaceholder name="KewtiPassword" description="Secure password input field." />
             <ComponentPlaceholder name="KewtiMap" description="Interactive mapping integration for picking location coordinates." />
             <ComponentPlaceholder name="KewtiFonts" description="Custom Ethiopian font application component." />
+            <ComponentPlaceholder name="KewtiIcons" description="Comming soon .." />
+                        <ComponentPlaceholder name="EthiopianCalendar" description="Calendar implementation supporting Gregorian-to-Habeshan date conversions." />
+            <ComponentPlaceholder name="TransactionValidator" description="Payment parsing and validation flows for CBE and Telebirr." />
           </div>
 
           <div className="mt-20 pt-8 border-t border-zinc-200 dark:border-zinc-800 text-sm text-zinc-500">
