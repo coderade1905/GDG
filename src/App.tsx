@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import KewtiPage from './kewtiPage/kewtiPage';
+import KewtiPage from './kewtiPage/KewtiPage';
 import KewtiDocumentation from './kewti-documentation/component';
 
 export function App() {
