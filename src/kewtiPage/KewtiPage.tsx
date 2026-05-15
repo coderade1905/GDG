@@ -76,19 +76,19 @@ export default function KewtiPage({ onNavigate }: { onNavigate?: (route: string)
             <a href="https://github.com/coderade1905/GDG" target="_blank" rel="noreferrer" className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-zinc-50">
               GitHub
             </a>
-              <button
-                onClick={(e) => {
-                  if (onNavigate) {
-                    e.preventDefault();
-                    onNavigate('docs');
-                  } else {
-                    smoothScrollTo(e, 'docs');
-                  }
-                }}
-                className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
-              >
-                Documentation
-              </button>
+            <button
+              onClick={(e) => {
+                if (onNavigate) {
+                  e.preventDefault();
+                  onNavigate('docs');
+                } else {
+                  smoothScrollTo(e, 'docs');
+                }
+              }}
+              className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
+            >
+              Documentation
+            </button>
           </div>
         </div>
 
@@ -107,11 +107,13 @@ export default function KewtiPage({ onNavigate }: { onNavigate?: (route: string)
       </div>
 
       <div className="flex-1 lg:w-[55%] xl:w-[60%] overflow-y-auto relative flex flex-col lg:h-screen bg-white/50 dark:bg-black/50 transition-colors duration-200">
-        {/* horizontal nav removed per request */}
 
         <div className="p-6 lg:p-12 xl:px-16 py-12 max-w-3xl w-full">
           <div id="docs" className="mb-12">
-            <h2 className="text-2xl font-bold tracking-tight mb-2">Build your component library</h2>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">Component library for {' '}
+              <span className="bg-gradient-to-r from-[#009A44] via-[#FED100] to-[#EF2B2D] bg-clip-text text-transparent">
+                Ethiopian Apps
+              </span></h2>
             <p className="text-zinc-500 dark:text-zinc-400">
               open source Ethiopian component library
             </p>
@@ -161,7 +163,7 @@ export default function KewtiPage({ onNavigate }: { onNavigate?: (route: string)
             <ComponentPlaceholder name="KewtiMap" description="Interactive mapping integration for picking location coordinates." />
             <ComponentPlaceholder name="KewtiFonts" description="Custom Ethiopian font application component." />
             <ComponentPlaceholder name="KewtiIcons" description="Comming soon .." />
-                        <ComponentPlaceholder name="EthiopianCalendar" description="Calendar implementation supporting Gregorian-to-Habeshan date conversions." />
+            <ComponentPlaceholder name="EthiopianCalendar" description="Calendar implementation supporting Gregorian-to-Habeshan date conversions." />
             <ComponentPlaceholder name="TransactionValidator" description="Payment parsing and validation flows for CBE and Telebirr." />
           </div>
 
@@ -191,6 +193,6 @@ function ComponentPlaceholder({ name, description }: { name: string, description
       </div>
     </div>
     </>
-   
+
   )
 }
