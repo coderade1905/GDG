@@ -111,7 +111,7 @@ export default function KewtiPage({ onNavigate }: { onNavigate?: (route: string)
         <div className="p-6 lg:p-12 xl:px-16 py-12 max-w-3xl w-full">
           <div id="docs" className="mb-12">
             <h2 className="text-2xl font-bold tracking-tight mb-2">Component library for {' '}
-              <span className="bg-gradient-to-r from-[#009A44] via-[#FED100] to-[#EF2B2D] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#009A44] from-33% via-[#FED100] via-33% via-66% to-[#EF2B2D] to-66% bg-clip-text text-transparent">
                 Ethiopian Apps
               </span></h2>
             <p className="text-zinc-500 dark:text-zinc-400">
