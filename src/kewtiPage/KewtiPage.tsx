@@ -36,7 +36,7 @@ export default function KewtiPage({ onNavigate }: { onNavigate?: (route: string)
   };
 
   const copyCommand = () => {
-    navigator.clipboard.writeText("npm install kewti-components");
+    navigator.clipboard.writeText("npm install kewti_components");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
