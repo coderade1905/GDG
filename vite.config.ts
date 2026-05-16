@@ -28,7 +28,7 @@ export default defineConfig({
       fileName: (format) => `kewti.${format}.js`,
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'react-dom/client'],
       output: {
         globals: {
           react: 'React',
