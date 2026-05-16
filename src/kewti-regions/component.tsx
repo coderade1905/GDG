@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/popover";
 import { useEffect } from "react";
 import Papa from "papaparse";
-import csvText from "../../../public/data.csv?raw";
 
 interface Row {
   admin1_name: string;
@@ -44,13 +43,17 @@ export function KewtiLocationSelector({
   });
 
   useEffect(() => {
-    Papa.parse(csvText, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        setData(results.data as Row[]);
-      },
-    });
+    fetch("/data.csv")
+      .then((res) => res.text())
+      .then((csvText) => {
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            setData(results.data as Row[]);
+          },
+        });
+      });
   }, []);
 
   useEffect(() => {
