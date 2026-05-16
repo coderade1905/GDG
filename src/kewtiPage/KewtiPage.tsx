@@ -80,6 +80,17 @@ export default function KewtiPage({ onNavigate }: { onNavigate?: (route: string)
               onClick={(e) => {
                 if (onNavigate) {
                   e.preventDefault();
+                  onNavigate('slides');
+                }
+              }}
+              className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
+            >
+              slides
+            </button>
+            <button
+              onClick={(e) => {
+                if (onNavigate) {
+                  e.preventDefault();
                   onNavigate('docs');
                 } else {
                   smoothScrollTo(e, 'docs');
