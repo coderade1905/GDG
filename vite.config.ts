@@ -6,15 +6,15 @@ import dts from "vite-plugin-dts"
 
 export default defineConfig({
   plugins: [
-    react(), 
-    tailwindcss(), 
-    dts({ 
+    react(),
+    tailwindcss(),
+    dts({
       tsconfigPath: './tsconfig.app.json',
       rollupTypes: true, // This will now be recognized
       insertTypesEntry: true,
-    }) 
+    })
   ],
-  
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
