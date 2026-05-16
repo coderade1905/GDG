@@ -243,8 +243,8 @@ export function KewtiMap({ onRegionSelect, label = 'Select Map' }: Props) {
         )}
       </label>
 
-      <div className="relative flex w-full max-w-[30vw] items-center justify-center overflow-hidden">
-        <div ref={svgContainerRef} className="h-full w-full" />
+      <div className="relative flex h-[clamp(420px,70vh,760px)] w-full items-center justify-center overflow-hidden">
+        <div ref={svgContainerRef} className="absolute inset-0 h-full w-full" />
 
         <div
           className={cn(

@@ -1,14 +1,22 @@
 import { useState } from 'react';
 import KewtiPage from './kewtiPage/KewtiPage';
 import KewtiDocumentation from './kewti-documentation/component';
+import KewtiSlidesPage from './kewtiPage/SlidesPage';
 
 export function App() {
-  const [route, setRoute] = useState<'home' | 'docs'>('home');
+  const [route, setRoute] = useState<'home' | 'docs' | 'slides'>('home');
 
   return (
     <>
       {route === 'home' ? (
-        <KewtiPage onNavigate={(r: string) => r === 'docs' && setRoute('docs')} />
+        <KewtiPage
+          onNavigate={(r: string) => {
+            if (r === 'docs') setRoute('docs');
+            if (r === 'slides') setRoute('slides');
+          }}
+        />
+      ) : route === 'slides' ? (
+        <KewtiSlidesPage onBack={() => setRoute('home')} />
       ) : (
         <div className="min-h-screen bg-background text-foreground">
           <header className="flex items-center justify-between px-6 py-3 border-b border-border bg-card sticky top-0 z-50">
